@@ -52,20 +52,7 @@ class FontMetrics
     {
         return $this->fontFile;
     }
-
-
-//    private function fillWidths()
-//    {
-//        $height = 0;
-//        for ($i = $this->firstChar; $i <= $this->lastChar; $i++) {
-//            list($xlb, $ylb, $xrb, $yrb, $xrt, $yrt, $xlt, $ylt) =
-//                imagettfbbox($this->fontSize, 0, $this->fontFile, chr($i));
-//
-//            $this->widths[$i] = max($xrb, $xrt) - min($xlb, $xlt);
-//            $height = max($height, max($yrb, $yrt) - min($ylb, $ylt));
-//        }
-//    }
-
+    
     /**
      * @return \int[]
      */
