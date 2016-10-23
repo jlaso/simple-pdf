@@ -42,11 +42,9 @@ class Dictionary extends AbstractPart implements PartInterface
             $result .= "\r\n";
             foreach ($this->data as $name => $item) {
                 if(method_exists($item, 'getReference')){
-                    $toPrint = $item->getReference()->dump();
-                }else{
-                    $toPrint = $item->dump();
+                    $item = $item->getReference();
                 }
-                $result .= sprintf("/%s %s\r\n", $name, $toPrint);
+                $result .= sprintf("/%s %s\r\n", $name, $item->dump());
             }
         }
         $result .= '>>';

@@ -1,0 +1,14 @@
+branches:
+  only:
+    - master
+    - 1.x
+
+language: php
+
+php:
+  - '5.6'
+  - '7.0'
+  - nightly
+  - hhvm
+
+sudo: false
