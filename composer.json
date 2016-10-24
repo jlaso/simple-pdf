@@ -1,5 +1,5 @@
 {
-  "name": "PHPfriends/simple-pdf",
+  "name": "phpfriends/simple-pdf",
   "description": "Generate PDF directly from PHP (in native PHP)",
   "keywords": ["pdf"],
   "homepage": "https://github.com/PHPfriends/simple-pdf",
