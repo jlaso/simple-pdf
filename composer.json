@@ -22,7 +22,7 @@
   },
   "autoload": {
     "psr-4": {
-      "PHPdriends\\SimplePdf\\": "src/"
+      "PHPfriends\\SimplePdf\\": "src/"
     }
   },
   "minimum-stability": "dev"
