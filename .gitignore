@@ -8,3 +8,4 @@ composer.lock
 src/Example/*.pdf
 
 cache/*.cached
+cache/*.json
