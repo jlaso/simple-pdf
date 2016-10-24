@@ -1,6 +1,6 @@
 <?php
 
-namespace JLaso\SimplePdf\Measurement;
+namespace PHPfriends\SimplePdf\Measurement;
 
 use FontLib\Font;
 

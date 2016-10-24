@@ -1,8 +1,8 @@
 <?php
 
-namespace JLaso\SimplePdf\Example;
+namespace PHPfriends\SimplePdf\Example;
 
-use JLaso\SimplePdf\Measurement\FontMetrics;
+use PHPfriends\SimplePdf\Measurement\FontMetrics;
 
 include __DIR__.'/../../vendor/autoload.php';
 

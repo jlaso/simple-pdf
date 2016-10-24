@@ -1,8 +1,8 @@
 <?php
 
-namespace JLaso\SimplePdf\Parts;
+namespace PHPfriends\SimplePdf\Parts;
 
-use JLaso\SimplePdf\Exceptions\ReferenceNotResolved;
+use PHPfriends\SimplePdf\Exceptions\ReferenceNotResolved;
 
 trait LazyReferenceTrait
 {

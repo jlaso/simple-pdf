@@ -1,17 +1,17 @@
 <?php
 
-namespace JLaso\SimplePdf\Main;
+namespace PHPfriends\SimplePdf\Main;
 
-use JLaso\SimplePdf\Exceptions\ReferenceNotResolved;
-use JLaso\SimplePdf\Parts\Catalog;
-use JLaso\SimplePdf\Parts\CrossRefTable;
-use JLaso\SimplePdf\Parts\MetadataDict;
-use JLaso\SimplePdf\Parts\NamesCatalog;
-use JLaso\SimplePdf\Parts\ObjectNode;
-use JLaso\SimplePdf\Parts\PagesNode;
-use JLaso\SimplePdf\Parts\PartInterface;
-use JLaso\SimplePdf\Parts\PdfString;
-use JLaso\SimplePdf\Parts\Trailer;
+use PHPfriends\SimplePdf\Exceptions\ReferenceNotResolved;
+use PHPfriends\SimplePdf\Parts\Catalog;
+use PHPfriends\SimplePdf\Parts\CrossRefTable;
+use PHPfriends\SimplePdf\Parts\MetadataDict;
+use PHPfriends\SimplePdf\Parts\NamesCatalog;
+use PHPfriends\SimplePdf\Parts\ObjectNode;
+use PHPfriends\SimplePdf\Parts\PagesNode;
+use PHPfriends\SimplePdf\Parts\PartInterface;
+use PHPfriends\SimplePdf\Parts\PdfString;
+use PHPfriends\SimplePdf\Parts\Trailer;
 
 class LowLevelPdf
 {

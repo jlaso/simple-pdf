@@ -1,16 +1,16 @@
 <?php
 
-namespace JLaso\SimplePdf\Example;
+namespace PHPfriends\SimplePdf\Example;
 
 include __DIR__.'/../../vendor/autoload.php';
 
-use JLaso\SimplePdf\Main\LowLevelPdf;
-use JLaso\SimplePdf\Parts\Box;
-use JLaso\SimplePdf\Parts\Content;
-use JLaso\SimplePdf\Parts\Font;
-use JLaso\SimplePdf\Parts\PageNode;
-use JLaso\SimplePdf\Parts\PagesNode;
-use JLaso\SimplePdf\Parts\ResourceNode;
+use PHPfriends\SimplePdf\Main\LowLevelPdf;
+use PHPfriends\SimplePdf\Parts\Box;
+use PHPfriends\SimplePdf\Parts\Content;
+use PHPfriends\SimplePdf\Parts\Font;
+use PHPfriends\SimplePdf\Parts\PageNode;
+use PHPfriends\SimplePdf\Parts\PagesNode;
+use PHPfriends\SimplePdf\Parts\ResourceNode;
 
 class Example1
 {

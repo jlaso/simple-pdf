@@ -1,6 +1,6 @@
 <?php
 
-namespace JLaso\SimplePdf\Parts;
+namespace PHPfriends\SimplePdf\Parts;
 
 class PdfReferenceTest extends \PHPUnit_Framework_TestCase
 {

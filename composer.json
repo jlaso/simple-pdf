@@ -22,7 +22,7 @@
   },
   "autoload": {
     "psr-4": {
-      "JLaso\\SimplePdf\\": "src/"
+      "PHPdriends\\SimplePdf\\": "src/"
     }
   },
   "minimum-stability": "dev"

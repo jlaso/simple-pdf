@@ -1,6 +1,6 @@
 <?php
 
-namespace JLaso\SimplePdf\Exceptions;
+namespace PHPfriends\SimplePdf\Exceptions;
 
 class ReferenceNotResolved extends \Exception
 {

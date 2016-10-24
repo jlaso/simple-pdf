@@ -1,7 +1,7 @@
 <?php
 
 
-namespace JLaso\SimplePdf\Parts;
+namespace PHPfriends\SimplePdf\Parts;
 
 
 class Content implements PartInterface
