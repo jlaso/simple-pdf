@@ -1,8 +1,8 @@
 {
-  "name": "jlaso/simple-pdf",
+  "name": "PHPfriends/simple-pdf",
   "description": "Generate PDF directly from PHP (in native PHP)",
   "keywords": ["pdf"],
-  "homepage": "https://github.com/jlaso/simple-pdf",
+  "homepage": "https://github.com/PHPfriends/simple-pdf",
   "type": "library",
   "license": "MIT",
   "authors": [
