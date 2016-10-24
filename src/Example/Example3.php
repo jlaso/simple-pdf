@@ -1,6 +1,6 @@
 <?php
 
-namespace JLaso\SimplePdf\Example;
+namespace PHPfriends\SimplePdf\Example;
 
 include __DIR__.'/../../vendor/autoload.php';
 

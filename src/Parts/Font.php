@@ -9,6 +9,8 @@ class Font extends Dictionary
     const TYPE = 'Font';
 
     const TYPE1 = 'Type1';
+    const TRUETYPE = 'Truetype';
+
     const HELVETICA = 'Helvetica';
     /**
     • Times-Roman
