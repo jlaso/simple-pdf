@@ -12,8 +12,6 @@ class FontMetrics
 
     /** @var string */
     protected $fontName;
-    /** @var int */
-    protected $fontSize;
     /** @var string */
     protected $fontStyle;
     /** @var int[] */
@@ -27,20 +25,18 @@ class FontMetrics
 
     /**
      * @param $fontName
-     * @param $fontSize
      * @param $fontStyle
      */
-    public function __construct($fontName, $fontSize, $fontStyle)
+    public function __construct($fontName, $fontStyle)
     {
         $this->fontName = $fontName;
-        $this->fontSize = $fontSize;
         $this->fontStyle = $fontStyle;
 
         $this->fontFile = dirname(__DIR__) .
             sprintf('/Fonts/%s/%s-%s.ttf', $this->fontName, $this->fontName, $this->fontStyle);
 
         $this->font = Font::load($this->fontFile);
-        //$this->fillWidths();
+
 
         $this->widths = $this->getCharMetrics();
     }
@@ -52,7 +48,7 @@ class FontMetrics
     {
         return $this->fontFile;
     }
-    
+
     /**
      * @return \int[]
      */
