@@ -37,8 +37,14 @@ class FontMetrics
 
         $this->font = Font::load($this->fontFile);
 
-
-        $this->widths = $this->getCharMetrics();
+        $cacheDir = dirname(dirname(__DIR__)).'/cache/';
+        $cachedFile = $cacheDir.sprintf('/%s-%s.cached', $this->fontName, $this->fontStyle);
+        if(!file_exists($cachedFile)){
+            $this->widths = $this->getCharMetrics();
+            file_put_contents($cachedFile, json_encode($this->widths));
+        }else {
+            $this->widths = json_decode(file_get_contents($cachedFile), true);
+        }
     }
 
     /**

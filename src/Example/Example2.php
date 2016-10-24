@@ -13,7 +13,7 @@ class Example2
 {
     public function process()
     {
-        $fontTool = new FontMetrics(FontMetrics::NEUTON, 777, FontMetrics::REGULAR);
+        $fontTool = new FontMetrics(FontMetrics::NEUTON, FontMetrics::REGULAR);
 
         $widths = $fontTool->getWidths();
 
