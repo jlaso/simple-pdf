@@ -20,7 +20,7 @@ class Example1
     {
         $pdf = new LowLevelPdf();
 
-        $pdf->setMetadataInfo('Author', 'JLaso');
+        $pdf->setMetadataInfo('Author', '@PHPfriendsTK');
         $pdf->setMetadataInfo('Creator', 'https://github.com/PHPfriends/simple-pdf');
 
         $helveticaFont = new Font('F1', Font::TYPE1, Font::HELVETICA);

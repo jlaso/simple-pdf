@@ -8,19 +8,25 @@ class Font
     protected $name;
     /** @var string */
     protected $style;
-    /** @var float */
-    protected $size;
 
     /**
      * @param string $name
      * @param string $style
-     * @param float $size
      */
-    public function __construct($name, $style, $size)
+    public function __construct($name, $style)
     {
         $this->name = $name;
         $this->style = $style;
-        $this->size = $size;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFontName()
+    {
+        $font = str_replace(' ','_',trim($this->name));
+
+        return sprintf("%s_%s", ucwords(strtolower($font)), strtolower($this->style));
     }
 
     /**
@@ -56,24 +62,6 @@ class Font
     public function setStyle($style)
     {
         $this->style = $style;
-        return $this;
-    }
-
-    /**
-     * @return float
-     */
-    public function getSize()
-    {
-        return $this->size;
-    }
-
-    /**
-     * @param float $size
-     * @return Font
-     */
-    public function setSize($size)
-    {
-        $this->size = $size;
         return $this;
     }
 }

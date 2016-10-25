@@ -4,19 +4,41 @@ namespace PHPfriends\SimplePdf\Main\Objects;
 
 class Page
 {
+    /** @var int */
+    protected $pageNum;
+    /** @var ContentInterface[] */
     protected $contents;
 
-    public function addContent($content)
+    /**
+     * @param int $num
+     */
+    public function __construct($num)
+    {
+        $this->pageNum = $num;
+    }
+
+
+    /**
+     * @param ContentInterface $content
+     */
+    public function addContent(ContentInterface $content)
     {
         $this->contents[] = $content;
     }
 
     /**
-     * @return mixed
+     * @return ContentInterface[]
      */
     public function getContents()
     {
         return $this->contents;
     }
 
+    /**
+     * @return int
+     */
+    public function getPageNum()
+    {
+        return $this->pageNum;
+    }
 }

@@ -19,26 +19,25 @@ class Example4
 
     public function process()
     {
-        $pdf = new HighLevelPdf();
+        $pdf = new HighLevelPdf(612.0, 792.0);
 
-        $pdf->setMetadata('Author', 'JLaso');
+        $pdf->setMetadata('Author', '@PHPfriendsTK');
         $pdf->setMetadata('Creator', 'https://github.com/PHPfriends/simple-pdf');
 
         $pdf->setFont('Helvetica', null, 48);
         $pdf->setCell();
         $pdf->writeTextJustify('Hello world !');
 
-        // WIP
 
-        $pdf->saveToFile(__DIR__.'/test.pdf');
+        $pdf->saveToFile(__DIR__.'/test4.pdf');
     }
 
     public static function main()
     {
-        $o = new Example1();
+        $o = new Example4();
         $o->process();
     }
 }
 
-Example1::main();
+Example4::main();
 echo "Done! \n";

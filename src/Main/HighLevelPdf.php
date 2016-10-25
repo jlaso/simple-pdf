@@ -5,10 +5,13 @@ namespace PHPfriends\SimplePdf\Main;
 use PHPfriends\SimplePdf\Events\EventDispatcher;
 use PHPfriends\SimplePdf\Main\Objects\Font;
 use PHPfriends\SimplePdf\Main\Objects\Page;
+use PHPfriends\SimplePdf\Main\Objects\TextCell;
 use PHPfriends\SimplePdf\Parts\Box;
+use PHPfriends\SimplePdf\Parts\Dictionary;
 use PHPfriends\SimplePdf\Parts\Font as FontDict;
 use PHPfriends\SimplePdf\Parts\PageNode;
 use PHPfriends\SimplePdf\Parts\PagesNode;
+use PHPfriends\SimplePdf\Parts\PdfArray;
 use PHPfriends\SimplePdf\Parts\ResourceNode;
 
 class HighLevelPdf
@@ -37,7 +40,7 @@ class HighLevelPdf
     /** @var float */
     protected $pageHeight = 214.97;
     /** @var int */
-    protected $currentPageNum = 1;
+    protected $currentPageNum = 0;
 
     /** @var float */
     protected $currentY = 0.0;
@@ -51,24 +54,44 @@ class HighLevelPdf
     protected $fonts;
     /** @var Font */
     protected $currentFont;
+    /** @var float */
+    protected $currentFontSize;
     /** @var Page[] */
     protected $pages;
     /** @var Page */
     protected $currentPage;
+    /** @var array */
+    protected $resources;
 
     /** @var EventDispatcher */
     protected $eventDispatcher;
 
-    public function __construct(EventDispatcher $eventDispatcher = null)
+    /**
+     * @param float $width
+     * @param float $height
+     */
+    public function __construct($width, $height)
     {
-        $this->eventDispatcher = $eventDispatcher;
+        $this->pageWidth = $width;
+        $this->pageHeight = $height;
+        $this->eventDispatcher = new EventDispatcher();
         $this->pdf = new LowLevelPdf();
-        $this->pages[$this->currentPageNum] = new Page();
+        $this->newPage();
+    }
+
+    /**
+     * @return EventDispatcher
+     */
+    public function getEventDispatcher()
+    {
+        return $this->eventDispatcher;
     }
 
     public function newPage()
     {
-        $this->pages[++$this->currentPageNum] = new Page();
+        $this->currentPage++;
+        $this->currentPage = new Page($this->currentPageNum);
+        $this->pages[$this->currentPageNum] = $this->currentPage;
     }
 
     /**
@@ -101,19 +124,37 @@ class HighLevelPdf
      * @param string $font
      * @param string $style
      * @param float $size
+     * @return $this
      */
     public function setFont($font, $style, $size)
     {
-        $this->currentFont = new Font($font, $style, $size);
-        $font = str_replace(' ','_',trim($font));
-        $key = sprintf("%s_%s", ucwords(strtolower($font)), strtolower($style));
+        $this->currentFont = new Font($font, $style);
+        $key = $this->currentFont->getFontName();
         // store font in order to include later in PDF file
         $this->fonts[$key] = $this->currentFont;
+        $this->resources[$this->currentPageNum]['Font'][$key] = true;
+        $this->currentFontSize = $size;
+
+        return $this;
     }
 
+    /**
+     * @param string $text
+     * @return $this
+     */
     public function writeTextJustify($text)
     {
-        // @TODO
+        $t = new TextCell(
+            $this->currentX,
+            $this->currentY,
+            $this->currentWidth,
+            $this->currentHeight,
+            $this->currentFont,
+            $this->currentFontSize,
+            $text
+        );
+
+        $this->currentPage->addContent($t);
 
         return $this;
     }
@@ -185,7 +226,7 @@ class HighLevelPdf
      */
     protected function oddPage()
     {
-        return (boolean)($this->currentPage % 2);
+        return (boolean)($this->currentPageNum % 2);
     }
 
     /**
@@ -199,6 +240,7 @@ class HighLevelPdf
 
     private function process()
     {
+        // add fonts as resources
         foreach($this->fonts as $key => $font){
             $fontDict = new FontDict($key, FontDict::TRUETYPE, $font->getName());
             $this->pdf->addObject($fontDict);
@@ -211,9 +253,16 @@ class HighLevelPdf
         $this->pdf->addObject($pagesNode);
 
         foreach($this->pages as $page){
-            $pageNode = new PageNode($pagesNode, $resources, new Box(0, 0, $this->pageWidth, $this->pageHeight));
+            $pageResources = new Dictionary();
+            if(count($this->resources[$page->getPageNum()]['Font']) > 0) {
+                $fonts = PdfArray::toPdfArrayNames(array_keys($this->resources[$page->getPageNum()]['Font']));
+                $pageResources->addItem('Font', $fonts);
+            }
+            $pageNode = new PageNode($pagesNode, $pageResources, new Box(0, 0, $this->pageWidth, $this->pageHeight));
             foreach($page->getContents() as $content){
-                $pageNode->setContents($content);
+                $c = $content->dump($this->pdf);
+                $pageNode->setContents($c);
+                $this->pdf->addObject($c);
             }
             $this->pdf->addObject($pageNode);
         }

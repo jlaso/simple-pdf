@@ -29,12 +29,20 @@ class Content implements PartInterface
         $this->stream = $stream;
     }
 
-    public function addText($x,$y,Font $font, $fontSize,$text)
+    /**
+     * @param float $x
+     * @param float $y
+     * @param Font|string $font
+     * @param float $fontSize
+     * @param string $text
+     */
+    public function addText($x, $y, $font, $fontSize, $text)
     {
+        $fontName = ($font instanceof Font) ? $font->getName() :  $font;
         $this->stream .= sprintf(
             "BT\r\n%.2F %.2F Td\r\n/%s %d Tf\r\n(%s) Tj\r\nET\r\n",
             $x, $y,
-            $font->getName(), $fontSize,
+            $fontName, $fontSize,
             $text
         );
     }
@@ -44,7 +52,7 @@ class Content implements PartInterface
      */
     public function dump()
     {
-        $result = "stream\r\n".$this->stream."\r\nendstream\r\n";
+        $result = "stream\r\n".trim($this->stream)."\r\nendstream\r\n";
 
         $this->header->addItem('Length', new PdfNumber(strlen($this->stream)));
 

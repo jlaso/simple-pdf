@@ -2,7 +2,7 @@
 
 Generate PDF directly from PHP (in native PHP)
 
-[![Build Status](https://travis-ci.org/jlaso/simple-pdf.svg?branch=master)](https://travis-ci.org/jlaso/simple-pdf)
+[![Build Status](https://travis-ci.org/PHPfriends/simple-pdf.svg?branch=master)](https://travis-ci.org/PHPfriends/simple-pdf)
 
 Run the sample code
 

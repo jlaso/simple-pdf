@@ -14,9 +14,19 @@ class PdfName implements PartInterface
         $this->value = (string) $value;
     }
 
+    /**
+     * @return string
+     */
     public function dump()
     {
         return '/'.$this->value;
     }
 
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return (string) $this->value;
+    }
 }
