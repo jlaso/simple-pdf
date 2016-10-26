@@ -104,4 +104,13 @@ class Trailer extends AbstractPart implements PartInterface
             $this->dumpBlock(self::NAME, $result).
             "\r\n\r\nstartxref\r\n".$this->startXref."\r\n%%EOF";
     }
+
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return 'Trailer '.md5($this->dump());
+    }
 }

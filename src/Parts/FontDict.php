@@ -32,10 +32,6 @@ class FontDict extends ConstrainedDictionary
     protected $name;
 
     protected $allowed = [
-        'Type' => [
-            'required' => true,
-            'options' => [ 'Font' ],
-        ],
         'Subtype' => [
             'required' => true,
             'options' => [ self::TYPE1, self::TRUETYPE ],
@@ -46,20 +42,6 @@ class FontDict extends ConstrainedDictionary
         'Name' => [
             'required' => true,
         ],
-        // @TODO: can be in a Type1 font, are only mandatory in the rest
-        // problem: if they are in Type1 font should be all of them
-//        'FirstChar' => [
-//            'required' => false,
-//        ],
-//        'LastChar' => [
-//            'required' => false,
-//        ],
-//        'Widths' => [
-//            'required' => false,
-//        ],
-//        'FontDescriptor' => [
-//            'required' => false,
-//        ],
         'Encoding' => [
             'required' => false,
             // @TODO: Can be a predefined Encoding or a declared one

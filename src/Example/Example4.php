@@ -24,7 +24,7 @@ class Example4
         $pdf->setMetadata('Author', '@PHPfriendsTK');
         $pdf->setMetadata('Creator', 'https://github.com/PHPfriends/simple-pdf');
 
-        $pdf->setFont('Helvetica', null, 48);
+        $pdf->setFont('Neuton', 'Regular', 48);
         $pdf->setCell();
         $pdf->writeTextJustify('Hello world !');
 

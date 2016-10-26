@@ -11,11 +11,8 @@ class ResourceNode extends Dictionary
 
     public function __construct()
     {
-        parent::__construct();
-
         $this->fontDict = new Dictionary();
     }
-
 
     /**
      * @param FontDict $font

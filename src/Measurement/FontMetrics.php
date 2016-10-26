@@ -22,6 +22,8 @@ class FontMetrics
     protected $lastChar = 127;
     /** @var string */
     private $fontFile;
+    /** @var array */
+    protected $os2;
 
     /**
      * @param $fontName
@@ -37,14 +39,16 @@ class FontMetrics
 
         $this->font = Font::load($this->fontFile);
 
-        $cacheDir = dirname(dirname(__DIR__)).'/cache/';
-        $cachedFile = $cacheDir.sprintf('/%s-%s.cached', $this->fontName, $this->fontStyle);
-        if(!file_exists($cachedFile)){
+        $cacheDir = dirname(dirname(__DIR__)) . '/cache/';
+        $cachedFile = $cacheDir . sprintf('/%s-%s.cached', $this->fontName, $this->fontStyle);
+        if (!file_exists($cachedFile)) {
             $this->widths = $this->getCharMetrics();
             file_put_contents($cachedFile, json_encode($this->widths));
-        }else {
+        } else {
             $this->widths = json_decode(file_get_contents($cachedFile), true);
         }
+
+        $this->os2 = $this->font->getData("OS/2");
     }
 
     /**
@@ -84,6 +88,51 @@ class FontMetrics
         }
 
         return $widths;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getBasename()
+    {
+        return $this->font->getFontPostscriptName();
+    }
+
+    public function getFontBBox()
+    {
+        $head = $this->font->getData("head");
+
+        return [
+            'xMin' => $this->font->normalizeFUnit($head["xMin"]),
+            'yMin' => $this->font->normalizeFUnit($head["yMin"]),
+            'xMax' => $this->font->normalizeFUnit($head["xMax"]),
+            'yMax' => $this->font->normalizeFUnit($head["yMax"]),
+        ];
+    }
+
+    public function getAscender()
+    {
+        $hhea = $this->font->getData("hhea");
+        if (isset($hhea["ascent"])) {
+            return $this->font->normalizeFUnit($hhea["ascent"]);
+        }
+        return $this->font->normalizeFUnit($this->os2["typoAscender"]);
+    }
+
+    public function getDescender()
+    {
+        $hhea = $this->font->getData("hhea");
+        if (isset($hhea["descent"])) {
+            return $this->font->normalizeFUnit($hhea["descent"]);
+        }
+        return $this->font->normalizeFUnit($this->os2["typoDescender"]);
+    }
+
+    public function getItalicAngle()
+    {
+        $post = $this->font->getData("post");
+
+        return $post["italicAngle"];
     }
 
 }

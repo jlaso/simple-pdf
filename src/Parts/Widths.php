@@ -19,7 +19,7 @@ class Widths implements PartInterface
     {
         foreach($values as $value){
             if(!is_numeric($value)){
-                throw new ValueNotValidOnDictException()
+                throw new ValueNotValidOnDictException("Widths expects all values of type numeric");
             }
         }
         $this->values = $values;
@@ -31,5 +31,14 @@ class Widths implements PartInterface
     public function dump()
     {
         return '[ ' . join(' ', $this->values). ' ]';
+    }
+
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return 'Widths '.md5($this->dump());
     }
 }

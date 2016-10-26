@@ -8,8 +8,6 @@ class Content implements PartInterface
 {
     use LazyReferenceTrait;
 
-    /** @var Dictionary */
-    protected $header;
     /** @var string */
     protected $stream;
 
@@ -18,7 +16,6 @@ class Content implements PartInterface
     public function __construct()
     {
         $this->stream = '';
-        $this->header = new Dictionary();
     }
 
     /**
@@ -52,14 +49,23 @@ class Content implements PartInterface
      */
     public function dump()
     {
+        $header = new Dictionary();
+
         $result = "stream\r\n".trim($this->stream)."\r\nendstream\r\n";
 
-        $this->header->addItem('Length', new PdfNumber(strlen($this->stream)));
+        $header->addItem('Length', new PdfNumber(strlen($this->stream)));
 
-        $result = $this->header->dump()."\r\n".$result;
+        $result = $header->dump()."\r\n".$result;
 
         return $result;
     }
 
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return 'Content '.md5($this->dump());
+    }
 
 }

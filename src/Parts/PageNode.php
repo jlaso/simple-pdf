@@ -34,9 +34,6 @@ class PageNode extends Dictionary
         $this->parent = $parent;
         $this->resources = $resources;
         $this->mediaBox = $mediaBox;
-
-        parent::__construct();
-
         $this->parent->addPage($this);
     }
 

@@ -33,4 +33,11 @@ class PdfAssocArray implements PartInterface
         return $result;
     }
 
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return 'PdfAssocArray '.md5($this->dump());
+    }
 }

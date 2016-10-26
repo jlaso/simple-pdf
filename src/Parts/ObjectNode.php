@@ -58,5 +58,11 @@ class ObjectNode extends AbstractPart implements PartInterface
         );
     }
 
-
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return sprintf("Object: %d %d R", $this->id, $this->generation);
+    }
 }

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace PHPfriends\SimplePdf\Parts;
-
 
 class CrossRefTable implements PartInterface
 {
@@ -31,5 +29,13 @@ class CrossRefTable implements PartInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return get_called_class();
     }
 }

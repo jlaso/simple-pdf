@@ -2,16 +2,21 @@
 
 namespace PHPfriends\SimplePdf\Main;
 
+use PHPfriends\SimplePdf\Adaptor\FontFile2FontDict;
 use PHPfriends\SimplePdf\Events\EventDispatcher;
 use PHPfriends\SimplePdf\Main\Objects\Font;
 use PHPfriends\SimplePdf\Main\Objects\Page;
 use PHPfriends\SimplePdf\Main\Objects\TextCell;
 use PHPfriends\SimplePdf\Parts\Box;
 use PHPfriends\SimplePdf\Parts\Dictionary;
-use PHPfriends\SimplePdf\Parts\FontDict as FontDict;
+use PHPfriends\SimplePdf\Parts\FontDescriptorDict;
+use PHPfriends\SimplePdf\Parts\FontDict;
+use PHPfriends\SimplePdf\Parts\FontDictTruetype;
+use PHPfriends\SimplePdf\Parts\NeedsObject;
 use PHPfriends\SimplePdf\Parts\PageNode;
 use PHPfriends\SimplePdf\Parts\PagesNode;
 use PHPfriends\SimplePdf\Parts\PdfArray;
+use PHPfriends\SimplePdf\Parts\PdfNumber;
 use PHPfriends\SimplePdf\Parts\ResourceNode;
 
 class HighLevelPdf
@@ -242,11 +247,7 @@ class HighLevelPdf
     {
         // add fonts as resources
         foreach($this->fonts as $key => $font){
-            $fontDict = new FontDict($key, FontDict::TRUETYPE, $font->getName());
-            $this->pdf->addObject($fontDict);
-            $resources = new ResourceNode();
-            $resources->addFont($fontDict);
-            $this->pdf->addObject($resources);
+            $this->handleFont($key, $font);
         }
 
         $pagesNode = new PagesNode();
@@ -267,6 +268,34 @@ class HighLevelPdf
             $this->pdf->addObject($pageNode);
         }
     }
+
+    private function handleFont($key, Font $font)
+    {
+        $ff2fd = new FontFile2FontDict($font->getName(), $font->getStyle());
+
+        $widths = $ff2fd->getWidths();
+        $this->pdf->addObject($widths);
+
+        $fontDescriptor = $ff2fd->getFontDescriptor();
+        foreach($fontDescriptor->getItems() as $item) {
+            if($item instanceof NeedsObject) {
+                $this->pdf->addObject($item);
+            }
+        }
+        $this->pdf->addObject($fontDescriptor);
+
+        $fontDict = new FontDictTruetype($key, $ff2fd->getBaseName());
+        $fontDict->addItem('Widths', $widths);
+        $fontDict->addItem('FirstChar', new PdfNumber(32));
+        $fontDict->addItem('LastChar', new PdfNumber(255));
+        $fontDict->addItem('FontDescriptor', $fontDescriptor);
+
+        $this->pdf->addObject($fontDict);
+        $resources = new ResourceNode();
+        $resources->addFont($fontDict);
+        $this->pdf->addObject($resources);
+    }
+
 
     /**
      * @param string $fileName

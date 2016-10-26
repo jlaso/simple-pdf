@@ -9,27 +9,11 @@ class Dictionary extends AbstractPart implements PartInterface
     /** @var PartInterface[] */
     protected $data = [];
 
-    public function __construct()
-    {
-        if (static::TYPE) {
-            $this->setType(static::TYPE);
-        }
-    }
-
     public function addItem($name, PartInterface $item)
     {
         $this->data[$name] = $item;
 
         return $this;
-    }
-
-    /**
-     * @param string $type
-     * @return Dictionary
-     */
-    public function setType($type)
-    {
-        return $this->addItem('Type', new PdfName($type));
     }
 
     /**
@@ -40,6 +24,9 @@ class Dictionary extends AbstractPart implements PartInterface
         $result = '<<';
         if (count($this->data) > 0) {
             $result .= "\r\n";
+            if (static::TYPE) {
+                $result .= sprintf("/Type %s\r\n", static::TYPE);
+            }
             foreach ($this->data as $name => $item) {
                 if(method_exists($item, 'getReference')){
                     $item = $item->getReference();
@@ -50,5 +37,13 @@ class Dictionary extends AbstractPart implements PartInterface
         $result .= '>>';
 
         return $result;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return 'Catalog '.md5($this->dump());
     }
 }

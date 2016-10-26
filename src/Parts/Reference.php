@@ -23,4 +23,13 @@ class Reference implements PartInterface
     {
         return sprintf("%d %d R", $this->id, $this->generation);
     }
+
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->dump();
+    }
 }

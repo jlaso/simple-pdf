@@ -40,4 +40,13 @@ class Box implements PartInterface
 
         return $array->dump();
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return '['.join(',', [$this->x, $this->y, $this->w, $this->h]).']';
+    }
+
 }

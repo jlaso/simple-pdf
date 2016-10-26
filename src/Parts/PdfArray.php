@@ -51,4 +51,11 @@ class PdfArray implements PartInterface
         return $result;
     }
 
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return 'PdfArray '.md5($this->dump());
+    }
 }

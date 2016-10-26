@@ -16,8 +16,6 @@ abstract class ConstrainedDictionary extends Dictionary
      */
     public function __construct()
     {
-        parent::__construct();
-
         if(count($this->allowed) == 0){
             throw new NotAllowedDeclaredException('You should declare a protected $allowed property in your  '.get_called_class());
         }

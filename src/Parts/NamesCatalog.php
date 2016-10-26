@@ -33,4 +33,12 @@ class NamesCatalog implements PartInterface
     {
         return sprintf("<<\r\n/Names\r\n%s\r\n>>", $this->values->dump());
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return 'NamesCatalog '.md5($this->dump());
+    }
 }

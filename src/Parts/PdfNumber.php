@@ -19,4 +19,11 @@ class PdfNumber implements PartInterface
         return ''.$this->value;
     }
 
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string) $this->value;
+    }
 }

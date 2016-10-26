@@ -5,10 +5,6 @@ namespace PHPfriends\SimplePdf\Parts;
 class FontDictTruetype extends FontDict
 {
     protected $allowed = [
-        'Type' => [
-            'required' => true,
-            'options' => [ 'Font' ],
-        ],
         'Subtype' => [
             'required' => true,
             'options' => [ self::TRUETYPE ],
@@ -43,8 +39,6 @@ class FontDictTruetype extends FontDict
      */
     public function __construct($name, $baseFont)
     {
-        $this->name = $name;
-
         parent::__construct($name, self::TRUETYPE, $baseFont);
     }
 
