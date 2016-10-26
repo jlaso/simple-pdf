@@ -2,7 +2,7 @@
 
 namespace PHPfriends\SimplePdf\Parts;
 
-class PdfDictionaryTest extends \PHPUnit_Framework_TestCase
+class DictionaryTest extends \PHPUnit_Framework_TestCase
 {
     public function testEmptyDictionaryValue()
     {

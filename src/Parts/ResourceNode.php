@@ -18,9 +18,9 @@ class ResourceNode extends Dictionary
 
 
     /**
-     * @param Font $font
+     * @param FontDict $font
      */
-    public function addFont(Font $font)
+    public function addFont(FontDict $font)
     {
         $this->fontDict->addItem($font->getName(), $font);
     }

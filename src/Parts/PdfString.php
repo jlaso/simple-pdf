@@ -14,6 +14,14 @@ class PdfString implements PartInterface
         $this->value = (string) $value;
     }
 
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return (string) $this->value;
+    }
+
     public function dump()
     {
         return '('.$this->value.')';

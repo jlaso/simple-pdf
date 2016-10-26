@@ -32,13 +32,13 @@ class Content implements PartInterface
     /**
      * @param float $x
      * @param float $y
-     * @param Font|string $font
+     * @param FontDict|string $font
      * @param float $fontSize
      * @param string $text
      */
     public function addText($x, $y, $font, $fontSize, $text)
     {
-        $fontName = ($font instanceof Font) ? $font->getName() :  $font;
+        $fontName = ($font instanceof FontDict) ? $font->getName() :  $font;
         $this->stream .= sprintf(
             "BT\r\n%.2F %.2F Td\r\n/%s %d Tf\r\n(%s) Tj\r\nET\r\n",
             $x, $y,

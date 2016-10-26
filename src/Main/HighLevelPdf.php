@@ -8,7 +8,7 @@ use PHPfriends\SimplePdf\Main\Objects\Page;
 use PHPfriends\SimplePdf\Main\Objects\TextCell;
 use PHPfriends\SimplePdf\Parts\Box;
 use PHPfriends\SimplePdf\Parts\Dictionary;
-use PHPfriends\SimplePdf\Parts\Font as FontDict;
+use PHPfriends\SimplePdf\Parts\FontDict as FontDict;
 use PHPfriends\SimplePdf\Parts\PageNode;
 use PHPfriends\SimplePdf\Parts\PagesNode;
 use PHPfriends\SimplePdf\Parts\PdfArray;

@@ -7,7 +7,7 @@ include __DIR__.'/../../vendor/autoload.php';
 use PHPfriends\SimplePdf\Main\LowLevelPdf;
 use PHPfriends\SimplePdf\Parts\Box;
 use PHPfriends\SimplePdf\Parts\Content;
-use PHPfriends\SimplePdf\Parts\Font;
+use PHPfriends\SimplePdf\Parts\FontDict;
 use PHPfriends\SimplePdf\Parts\PageNode;
 use PHPfriends\SimplePdf\Parts\PagesNode;
 use PHPfriends\SimplePdf\Parts\ResourceNode;
@@ -23,7 +23,7 @@ class Example1
         $pdf->setMetadataInfo('Author', '@PHPfriendsTK');
         $pdf->setMetadataInfo('Creator', 'https://github.com/PHPfriends/simple-pdf');
 
-        $helveticaFont = new Font('F1', Font::TYPE1, Font::HELVETICA);
+        $helveticaFont = new FontDict('F1', FontDict::TYPE1, FontDict::HELVETICA);
         $pdf->addObject($helveticaFont);
 
         $resources = new ResourceNode();

@@ -2,7 +2,7 @@
 
 namespace PHPfriends\SimplePdf\Parts;
 
-class FontDescriptor extends Dictionary
+class FontDescriptorDict extends Dictionary
 {
     use LazyReferenceTrait;
 }

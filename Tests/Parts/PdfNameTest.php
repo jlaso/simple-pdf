@@ -4,6 +4,10 @@ namespace PHPfriends\SimplePdf\Parts;
 
 class PdfNameTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * A PdfName (or Literal) its only a string preceded by a slash
+     * @TODO: check the non-valid literals
+     */
     public function testDumpValue()
     {
         $uniq = md5(uniqid());
@@ -14,8 +18,8 @@ class PdfNameTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * demonstrates that a PdfName can be compared in a in_array sentence
-     * because its _toString method
+     * demonstrates that a PdfName can be compared with in_array
+     * thanks to its _toString method
      */
     public function testInArrayValue()
     {
