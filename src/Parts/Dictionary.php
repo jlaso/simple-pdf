@@ -25,7 +25,7 @@ class Dictionary extends AbstractPart implements PartInterface
         if (count($this->data) > 0) {
             $result .= "\r\n";
             if (static::TYPE) {
-                $result .= sprintf("/Type %s\r\n", static::TYPE);
+                $result .= sprintf("/Type /%s\r\n", static::TYPE);
             }
             foreach ($this->data as $name => $item) {
                 if(method_exists($item, 'getReference')){

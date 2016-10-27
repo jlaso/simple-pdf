@@ -4,7 +4,7 @@ namespace PHPfriends\SimplePdf\Parts;
 
 class ResourceNode extends Dictionary
 {
-    use LazyReferenceTrait;
+    //use LazyReferenceTrait;
 
     /** @var Dictionary */
     protected $fontDict;

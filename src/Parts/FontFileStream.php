@@ -8,7 +8,7 @@ use PHPfriends\SimplePdf\Adaptor\FilterInterface;
 use PHPfriends\SimplePdf\Adaptor\FlateDecodeFilter;
 use PHPfriends\SimplePdf\Exceptions\ToDoException;
 
-class FontFileStream implements PartInterface, NeedsObject
+class FontFileStream implements PartInterface
 {
     use LazyReferenceTrait;
 
@@ -40,7 +40,11 @@ class FontFileStream implements PartInterface, NeedsObject
     {
         $header = new Dictionary();
 
-        $stream = file_get_contents($this->fontFile);
+        $file = fopen($this->fontFile,'rb');
+        $stream = fread($file, filesize($this->fontFile));
+        fclose($file);
+        //$stream = file_get_contents($this->fontFile);
+
         $header->addItem('Length1', new PdfNumber(strlen($stream)));
 
         $filter = new FlateDecodeFilter();

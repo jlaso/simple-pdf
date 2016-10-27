@@ -6,10 +6,10 @@ use PHPfriends\SimplePdf\Measurement\FontMetrics;
 use PHPfriends\SimplePdf\Parts\Box;
 use PHPfriends\SimplePdf\Parts\FontDescriptorDict;
 use PHPfriends\SimplePdf\Parts\FontDict as FontDict;
-use FontLib\Font as FontFile;
+use FontLib\Font as FontLibFont;
+use PHPfriends\SimplePdf\Parts\FontFileStream;
 use PHPfriends\SimplePdf\Parts\PdfName;
 use PHPfriends\SimplePdf\Parts\PdfNumber;
-use PHPfriends\SimplePdf\Parts\PdfString;
 use PHPfriends\SimplePdf\Parts\Widths;
 
 class FontFile2FontDict
@@ -20,7 +20,7 @@ class FontFile2FontDict
     protected $widths;
     /** @var string */
     protected $encoding;
-    /** @var FontFile */
+    /** @var FontLibFont */
     protected $fontFile;
     /** @var string */
     protected $name;
@@ -33,6 +33,9 @@ class FontFile2FontDict
     protected $ascent;
     protected $descent;
     protected $italicAngle;
+    protected $cmap;
+    /** @var int */
+    protected $widthsLength;
 
     /**
      * @param string $name
@@ -48,12 +51,14 @@ class FontFile2FontDict
 
         $widths = $fontTool->getWidths();
         $this->widths = new Widths($widths);
+        $this->widthsLength = count($widths);
 
         $this->baseName = $fontTool->getBasename();
         $this->fontBBox = $fontTool->getFontBBox();
         $this->ascent = $fontTool->getAscender();
         $this->descent = $fontTool->getDescender();
         $this->italicAngle = $fontTool->getItalicAngle();
+        $this->cmap = $fontTool->getCmap();
     }
 
     /**
@@ -70,6 +75,14 @@ class FontFile2FontDict
     public function getWidths()
     {
         return $this->widths;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWidthsLength()
+    {
+        return $this->widthsLength;
     }
 
     /**
@@ -108,6 +121,7 @@ class FontFile2FontDict
         $fdd->addItem('CapHeight', new PdfNumber(0));
         $fdd->addItem('StemV', new PdfNumber(0));
         $fdd->addItem('Flags', new PdfNumber(0));
+        $fdd->addItem('FontFile2', new FontFileStream($this->fontFile));
 
         return $fdd;
     }

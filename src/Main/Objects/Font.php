@@ -24,9 +24,9 @@ class Font
      */
     public function getFontName()
     {
-        $font = str_replace(' ','_',trim($this->name));
+        $font = str_replace(' ','-',ucwords(trim($this->name)));
 
-        return sprintf("%s_%s", ucwords(strtolower($font)), strtolower($this->style));
+        return sprintf("%s-%s", $font, ucwords($this->style));
     }
 
     /**

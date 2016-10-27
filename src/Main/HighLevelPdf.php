@@ -16,6 +16,7 @@ use PHPfriends\SimplePdf\Parts\NeedsObject;
 use PHPfriends\SimplePdf\Parts\PageNode;
 use PHPfriends\SimplePdf\Parts\PagesNode;
 use PHPfriends\SimplePdf\Parts\PdfArray;
+use PHPfriends\SimplePdf\Parts\PdfName;
 use PHPfriends\SimplePdf\Parts\PdfNumber;
 use PHPfriends\SimplePdf\Parts\ResourceNode;
 
@@ -245,20 +246,27 @@ class HighLevelPdf
 
     private function process()
     {
+        $fonts = [];
+
         // add fonts as resources
         foreach($this->fonts as $key => $font){
-            $this->handleFont($key, $font);
+            if(!isset($fonts[$key])) {
+                $fonts[$key] = $this->handleFont($key, $font);
+            }
         }
 
         $pagesNode = new PagesNode();
         $this->pdf->addObject($pagesNode);
 
         foreach($this->pages as $page){
-            $pageResources = new Dictionary();
-            if(count($this->resources[$page->getPageNum()]['Font']) > 0) {
-                $fonts = PdfArray::toPdfArrayNames(array_keys($this->resources[$page->getPageNum()]['Font']));
-                $pageResources->addItem('Font', $fonts);
+            $pageResources = new ResourceNode();
+            foreach($this->resources[$page->getPageNum()]['Font'] as $fontKey => $used) {
+                if($used) {
+                    $pageResources->addFont($fonts[$fontKey]);
+                }
             }
+            $this->pdf->addObject($pageResources);
+
             $pageNode = new PageNode($pagesNode, $pageResources, new Box(0, 0, $this->pageWidth, $this->pageHeight));
             foreach($page->getContents() as $content){
                 $c = $content->dump($this->pdf);
@@ -278,7 +286,7 @@ class HighLevelPdf
 
         $fontDescriptor = $ff2fd->getFontDescriptor();
         foreach($fontDescriptor->getItems() as $item) {
-            if($item instanceof NeedsObject) {
+            if(method_exists($item,'getReference')) {
                 $this->pdf->addObject($item);
             }
         }
@@ -287,13 +295,16 @@ class HighLevelPdf
         $fontDict = new FontDictTruetype($key, $ff2fd->getBaseName());
         $fontDict->addItem('Widths', $widths);
         $fontDict->addItem('FirstChar', new PdfNumber(32));
-        $fontDict->addItem('LastChar', new PdfNumber(255));
+        $fontDict->addItem('LastChar', new PdfNumber($ff2fd->getWidthsLength() + 32 + 1));
         $fontDict->addItem('FontDescriptor', $fontDescriptor);
-
+        $fontDict->addItem('Encoding', new PdfName('MacRomanEncoding'));
         $this->pdf->addObject($fontDict);
-        $resources = new ResourceNode();
-        $resources->addFont($fontDict);
-        $this->pdf->addObject($resources);
+
+        //$resources = new ResourceNode();
+        //$resources->addFont($fontDict);
+        //$this->pdf->addObject($resources);
+
+        return $fontDict;
     }
 
 

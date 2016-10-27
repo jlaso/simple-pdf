@@ -98,6 +98,9 @@ class FontMetrics
         return $this->font->getFontPostscriptName();
     }
 
+    /**
+     * @return array
+     */
     public function getFontBBox()
     {
         $head = $this->font->getData("head");
@@ -110,6 +113,9 @@ class FontMetrics
         ];
     }
 
+    /**
+     * @return float
+     */
     public function getAscender()
     {
         $hhea = $this->font->getData("hhea");
@@ -119,6 +125,9 @@ class FontMetrics
         return $this->font->normalizeFUnit($this->os2["typoAscender"]);
     }
 
+    /**
+     * @return float
+     */
     public function getDescender()
     {
         $hhea = $this->font->getData("hhea");
@@ -128,11 +137,19 @@ class FontMetrics
         return $this->font->normalizeFUnit($this->os2["typoDescender"]);
     }
 
+    /**
+     * @return mixed
+     */
     public function getItalicAngle()
     {
         $post = $this->font->getData("post");
 
         return $post["italicAngle"];
+    }
+
+    public function getCmap()
+    {
+        return $this->font->getData('cmap');
     }
 
 }

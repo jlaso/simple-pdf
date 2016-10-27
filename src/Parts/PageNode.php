@@ -12,7 +12,7 @@ class PageNode extends Dictionary
 
     /** @var PagesNode */
     protected $parent;
-    /** @var Dictionary */
+    /** @var ResourceNode */
     protected $resources;
     /** @var Box */
     protected $mediaBox;
@@ -23,12 +23,12 @@ class PageNode extends Dictionary
 
     /**
      * @param PagesNode $parent
-     * @param Dictionary $resources
+     * @param ResourceNode $resources
      * @param Box $mediaBox
      */
     public function __construct(
         PagesNode $parent,
-        Dictionary $resources,
+        ResourceNode $resources,
         Box $mediaBox
     ) {
         $this->parent = $parent;

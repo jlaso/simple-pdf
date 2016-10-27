@@ -93,8 +93,8 @@ class LowLevelPdf
     protected function generateBuffer()
     {
         $buffer = "%PDF-" . self::VERSION . "\r\n";
-        //$buffer .= "%\xE2\xE3\xCF\xD3\r\n";
-        //$buffer .= sprintf("%% created on %s\r\n", date('Y-m-d H:i:j'));
+        $buffer .= "%\xE2\xE3\xCF\xD3\r\n";
+        $buffer .= sprintf("%% created on %s\r\n", date('Y-m-d H:i:j'));
         $crossRefTable = new CrossRefTable();
 
         $this->trailer
