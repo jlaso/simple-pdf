@@ -40,12 +40,13 @@ class FontFileStream implements PartInterface
     {
         $header = new Dictionary();
 
+        $length = filesize($this->fontFile);
         $file = fopen($this->fontFile,'rb');
-        $stream = fread($file, filesize($this->fontFile));
+        $stream = fread($file, $length);
         fclose($file);
         //$stream = file_get_contents($this->fontFile);
 
-        $header->addItem('Length1', new PdfNumber(strlen($stream)));
+        $header->addItem('Length1', new PdfNumber($length));
 
         $filter = new FlateDecodeFilter();
         $stream = $filter->filter($stream);

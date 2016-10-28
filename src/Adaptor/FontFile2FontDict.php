@@ -109,7 +109,7 @@ class FontFile2FontDict
         $fdd->addItem('Descent', new PdfNumber($this->descent));
         $fdd->addItem('CapHeight', new PdfNumber(0));
         $fdd->addItem('StemV', new PdfNumber(0));
-        $fdd->addItem('Flags', new PdfNumber(0));
+        $fdd->addItem('Flags', new PdfNumber(32));
         $fdd->addItem('FontFile2', new FontFileStream($this->fontFile));
 
         return $fdd;

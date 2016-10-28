@@ -25,7 +25,11 @@ class Example4
         $pdf->setMetadata('Creator', 'https://github.com/PHPfriends/simple-pdf');
 
         $pdf->setFont('Neuton', 'Regular', 48);
-        $pdf->setCell(null, null, 48, null);
+        $pdf->setCell();
+        $pdf->writeTextJustify('Hello world !');
+
+        //$pdf->setFont('Neuton', 'Italic', 56);
+        $pdf->setCell(null, 100);
         $pdf->writeTextJustify('Hello world !');
 
 

@@ -92,7 +92,14 @@ class FontMetrics
         $os2 = $this->font->getData('OS/2');
         $add('os2', $os2);
         $add('hmtx', $this->font->getData('hmtx'));
-        $add('baseFont', $this->font->getFontPostscriptName());
+        $add('baseName', $this->font->getFontPostscriptName());
+        $add('copyright', $this->font->getFontCopyright());
+        $add('fontType', $this->font->getFontType());
+        $add('subFamily', $this->font->getFontSubfamily());
+        $add('fontFullName', $this->font->getFontFullName());
+        $add('fontVersion', $this->font->getFontVersion());
+        $add('fontWeight', $this->font->getFontWeight());
+        $add('subset', $this->font->getSubset());
         $head = $this->font->getData('head');
         $add('head', $head);
         $fontBBox = [
@@ -147,9 +154,14 @@ class FontMetrics
     /**
      * @return \int[]
      */
-    public function getWidths()
+    public function getWidths($from = 32, $to = 255)
     {
-        return $this->widths;
+        $result = [];
+        for($i = $from; $i <= $to; $i++){
+            $result[$i] = isset($this->widths[''.$i]) ? $this->widths['' . $i] : 0;
+        }
+
+        return $result;
     }
 
     /**
@@ -168,7 +180,7 @@ class FontMetrics
             foreach ($glyphIndexArray as $c => $g) {
                 $seed = isset($hmtx[$g]) ? $hmtx[$g][0] : $hmtx[0][0];
 
-                $widths['U' . $c] = $this->font->normalizeFUnit($seed);
+                $widths['' . $c] = $this->font->normalizeFUnit($seed);
             }
         }
 
@@ -224,7 +236,7 @@ class FontMetrics
      * @param string $type
      * @return float
      */
-    public function fontHeight($type = 'cap')
+    public function getFontHeight($type = 'cap')
     {
         switch ($type){
             case 'cap':

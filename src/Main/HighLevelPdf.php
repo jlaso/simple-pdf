@@ -8,6 +8,7 @@ use PHPfriends\SimplePdf\Main\Objects\Font;
 use PHPfriends\SimplePdf\Main\Objects\Page;
 use PHPfriends\SimplePdf\Main\Objects\TextCell;
 use PHPfriends\SimplePdf\Parts\Box;
+use PHPfriends\SimplePdf\Parts\Content;
 use PHPfriends\SimplePdf\Parts\Dictionary;
 use PHPfriends\SimplePdf\Parts\FontDescriptorDict;
 use PHPfriends\SimplePdf\Parts\FontDict;
@@ -150,6 +151,7 @@ class HighLevelPdf
     public function setFont($font, $style, $size)
     {
         $this->currentFont = new Font($font, $style);
+        $this->currentFontHeight = $this->currentFont->getFontHeight($size);
         $key = $this->currentFont->getFontName();
         // store font in order to include later in PDF file
         $this->fonts[$key] = $this->currentFont;
@@ -284,12 +286,13 @@ class HighLevelPdf
             }
             $this->pdf->addObject($pageResources);
 
+            $pageContents = new Content();
             $pageNode = new PageNode($pagesNode, $pageResources, new Box(0, 0, $this->pageWidth, $this->pageHeight));
             foreach($page->getContents() as $content){
-                $c = $content->dump($this->pdf);
-                $pageNode->setContents($c);
-                $this->pdf->addObject($c);
+                $content->addToContent($pageContents);
             }
+            $pageNode->setContents($pageContents);
+            $this->pdf->addObject($pageContents);
             $this->pdf->addObject($pageNode);
         }
     }
@@ -312,7 +315,7 @@ class HighLevelPdf
         $fontDict = new FontDictTruetype($key, $ff2fd->getBaseName());
         $fontDict->addItem('Widths', $widths);
         $fontDict->addItem('FirstChar', new PdfNumber(32));
-        $fontDict->addItem('LastChar', new PdfNumber($widths->getLength() + 32 + 1));
+        $fontDict->addItem('LastChar', new PdfNumber($widths->getLength() + 32 - 1));
         $fontDict->addItem('FontDescriptor', $fontDescriptor);
         $fontDict->addItem('Encoding', new PdfName('MacRomanEncoding'));
         $this->pdf->addObject($fontDict);

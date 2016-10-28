@@ -49,9 +49,16 @@ class TextCell implements ContentInterface
     public function dump($options = [])
     {
         $content = new Content();
-        $content->addText($this->x, $this->y, $this->font->getFontName(), $this->fontSize, $this->text);
+        $this->addToContent($content);
 
         return $content;
     }
 
+    /**
+     * @param Content $content
+     */
+    public function addToContent(Content $content)
+    {
+        $content->addText($this->x, $this->y, $this->font->getFontName(), $this->fontSize, $this->text);
+    }
 }

@@ -11,4 +11,11 @@ interface ContentInterface
      * @return Content
      */
     public function dump($options = []);
+
+    /**
+     * @param Content $content
+     * @return void
+     */
+    public function addToContent(Content $content);
+
 }

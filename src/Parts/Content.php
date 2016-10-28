@@ -26,6 +26,11 @@ class Content implements PartInterface
         $this->stream = $stream;
     }
 
+    public function addStream($stream)
+    {
+        $this->stream .= $stream;
+    }
+
     /**
      * @param float $x
      * @param float $y
