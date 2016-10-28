@@ -295,7 +295,7 @@ class HighLevelPdf
         $fontDict = new FontDictTruetype($key, $ff2fd->getBaseName());
         $fontDict->addItem('Widths', $widths);
         $fontDict->addItem('FirstChar', new PdfNumber(32));
-        $fontDict->addItem('LastChar', new PdfNumber($ff2fd->getWidthsLength() + 32 + 1));
+        $fontDict->addItem('LastChar', new PdfNumber($widths->getLength() + 32 + 1));
         $fontDict->addItem('FontDescriptor', $fontDescriptor);
         $fontDict->addItem('Encoding', new PdfName('MacRomanEncoding'));
         $this->pdf->addObject($fontDict);

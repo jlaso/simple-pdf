@@ -26,6 +26,14 @@ class Widths implements PartInterface
     }
 
     /**
+     * @return int
+     */
+    public function getLength()
+    {
+        return count($this->values);
+    }
+
+    /**
      * @return string
      */
     public function dump()

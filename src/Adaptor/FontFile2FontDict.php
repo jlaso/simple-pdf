@@ -34,8 +34,6 @@ class FontFile2FontDict
     protected $descent;
     protected $italicAngle;
     protected $cmap;
-    /** @var int */
-    protected $widthsLength;
 
     /**
      * @param string $name
@@ -51,7 +49,6 @@ class FontFile2FontDict
 
         $widths = $fontTool->getWidths();
         $this->widths = new Widths($widths);
-        $this->widthsLength = count($widths);
 
         $this->baseName = $fontTool->getBasename();
         $this->fontBBox = $fontTool->getFontBBox();
@@ -75,14 +72,6 @@ class FontFile2FontDict
     public function getWidths()
     {
         return $this->widths;
-    }
-
-    /**
-     * @return int
-     */
-    public function getWidthsLength()
-    {
-        return $this->widthsLength;
     }
 
     /**
