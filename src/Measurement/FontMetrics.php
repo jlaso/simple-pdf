@@ -24,6 +24,21 @@ class FontMetrics
     private $fontFile;
     /** @var array */
     protected $os2;
+    /** @var string */
+    protected $baseName;
+
+    protected $hmtx;
+    protected $head;
+    protected $fontBBox;
+    protected $hhea;
+    protected $ascent;
+    protected $descent;
+    protected $post;
+    protected $italicAngle;
+    protected $cmap;
+    protected $heightOffset;
+    protected $underlineThickness;
+    protected $underlinePosition;
 
     /**
      * @param $fontName
@@ -37,18 +52,88 @@ class FontMetrics
         $this->fontFile = dirname(__DIR__) .
             sprintf('/Fonts/%s/%s-%s.ttf', $this->fontName, $this->fontName, $this->fontStyle);
 
-        $this->font = Font::load($this->fontFile);
-
         $cacheDir = dirname(dirname(__DIR__)) . '/cache/';
-        $cachedFile = $cacheDir . sprintf('/%s-%s.cached', $this->fontName, $this->fontStyle);
-        if (!file_exists($cachedFile)) {
-            $this->widths = $this->getCharMetrics();
-            file_put_contents($cachedFile, json_encode($this->widths));
-        } else {
-            $this->widths = json_decode(file_get_contents($cachedFile), true);
+        $cachedFile = $cacheDir . sprintf('/%s-%s.php', $this->fontName, $this->fontStyle);
+
+        if (!file_exists($cachedFile) || (filemtime($this->fontFile) != filemtime($cachedFile))) {
+
+            $this->font = Font::load($this->fontFile);
+            $this->createCacheFile($cachedFile);
+            touch($cachedFile, filemtime($this->fontFile ));
+
         }
 
-        $this->os2 = $this->font->getData("OS/2");
+        $cachedData = include($cachedFile);
+        foreach($cachedData['keys'] as $property){
+            $this->{$property} = $cachedData['data'][$property];
+        }
+        unset($cachedData);
+    }
+
+    /**
+     * @param string $dest   file
+     */
+    private function createCacheFile($dest)
+    {
+        $script = [];
+
+        $add = function($name, $data) use (&$script){
+            $script[] = sprintf('$keys[] = "%s";', $name);
+            $script[] = sprintf('$data["%s"] = %s;', $name, var_export($data, true));
+        };
+
+        $script[] = "<?php\r\n// Created on ".date("Y-m-d")."\r\n";
+        $fontFile = str_replace(dirname(dirname(__DIR__)), '', $this->fontFile);
+        $script[] = "// FONT: ".$this->fontName.'-'.$this->fontStyle."\r\n";
+        $script[] = "// fontFile: ".$fontFile."\r\n";
+        $script[] = '$data=[]; $keys=[];';
+        $script[] = '';
+        $add('widths', $this->getCharMetrics());
+        $os2 = $this->font->getData('OS/2');
+        $add('os2', $os2);
+        $add('hmtx', $this->font->getData('hmtx'));
+        $add('baseFont', $this->font->getFontPostscriptName());
+        $head = $this->font->getData('head');
+        $add('head', $head);
+        $fontBBox = [
+            'xMin' => $this->font->normalizeFUnit($head['xMin']),
+            'yMin' => $this->font->normalizeFUnit($head['yMin']),
+            'xMax' => $this->font->normalizeFUnit($head['xMax']),
+            'yMax' => $this->font->normalizeFUnit($head['yMax']),
+        ];
+        $add('fontBBox', $fontBBox);
+        $hhea = $this->font->getData('hhea');
+        $add('hhea', $hhea);
+        $add(
+            'ascent',
+            $this->font->normalizeFUnit(
+                isset($hhea['ascent']) ? $hhea['ascent'] : $os2['typoAscender']
+            )
+        );
+        $add(
+            'descent',
+            $this->font->normalizeFUnit(
+                isset($hhea['descent']) ? $hhea['descent'] : $os2['typoDescender']
+            )
+        );
+        $add(
+            'heightOffset',
+            $this->font->normalizeFUnit(
+                isset($hhea['descent']) ? $hhea["lineGap"] : $os2["typoLineGap"]
+            )
+        );
+        $post = $this->font->getData('post');
+        $add('post', $post);
+        $add('italicAngle', $post['italicAngle']);
+        $add('cmap', $this->font->getData('cmap'));
+        $add('isFixedPitch', ($post['isFixedPitch'] ? true : false));
+        $add('underlineThickness', $this->font->normalizeFUnit($post['underlineThickness']));
+        $add('underlinePosition', $this->font->normalizeFUnit($post['underlinePosition']));
+
+        $script[] = '';
+        $script[] = 'return ["data" => $data, "keys" => $keys];';
+
+        file_put_contents($dest, join("\r\n", $script));
     }
 
     /**
@@ -95,7 +180,7 @@ class FontMetrics
      */
     public function getBasename()
     {
-        return $this->font->getFontPostscriptName();
+        return $this->baseName;
     }
 
     /**
@@ -103,14 +188,7 @@ class FontMetrics
      */
     public function getFontBBox()
     {
-        $head = $this->font->getData("head");
-
-        return [
-            'xMin' => $this->font->normalizeFUnit($head["xMin"]),
-            'yMin' => $this->font->normalizeFUnit($head["yMin"]),
-            'xMax' => $this->font->normalizeFUnit($head["xMax"]),
-            'yMax' => $this->font->normalizeFUnit($head["yMax"]),
-        ];
+        return $this->fontBBox;
     }
 
     /**
@@ -118,11 +196,7 @@ class FontMetrics
      */
     public function getAscender()
     {
-        $hhea = $this->font->getData("hhea");
-        if (isset($hhea["ascent"])) {
-            return $this->font->normalizeFUnit($hhea["ascent"]);
-        }
-        return $this->font->normalizeFUnit($this->os2["typoAscender"]);
+        return $this->ascent;
     }
 
     /**
@@ -130,11 +204,7 @@ class FontMetrics
      */
     public function getDescender()
     {
-        $hhea = $this->font->getData("hhea");
-        if (isset($hhea["descent"])) {
-            return $this->font->normalizeFUnit($hhea["descent"]);
-        }
-        return $this->font->normalizeFUnit($this->os2["typoDescender"]);
+        return $this->descent;
     }
 
     /**
@@ -142,14 +212,48 @@ class FontMetrics
      */
     public function getItalicAngle()
     {
-        $post = $this->font->getData("post");
-
-        return $post["italicAngle"];
+        return $this->italicAngle;
     }
 
     public function getCmap()
     {
-        return $this->font->getData('cmap');
+        return $this->cmap;
+    }
+
+    /**
+     * @param string $type
+     * @return float
+     */
+    public function fontHeight($type = 'cap')
+    {
+        switch ($type){
+            case 'cap':
+                break;
+
+            case 'offset':
+                return $this->heightOffset;
+                break;
+
+            case 'bbox':
+                return (abs($this->fontBBox['yMin'] - $this->fontBBox['yMax']));
+                break;
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUnderlineThickness()
+    {
+        return $this->underlineThickness;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUnderlinePosition()
+    {
+        return $this->underlinePosition;
     }
 
 }

@@ -62,6 +62,8 @@ class HighLevelPdf
     protected $currentFont;
     /** @var float */
     protected $currentFontSize;
+    /** @var float */
+    protected $currentFontHeight;
     /** @var Page[] */
     protected $pages;
     /** @var Page */
@@ -83,6 +85,19 @@ class HighLevelPdf
         $this->eventDispatcher = new EventDispatcher();
         $this->pdf = new LowLevelPdf();
         $this->newPage();
+    }
+
+    /**
+     * transforms Y in order to maintain a virtual coordinate system based on
+     * top-left corner is the (0,0) origin
+     *
+     * @param float $y
+     * @param float $h
+     * @return float
+     */
+    public function xformY($y, $h = 0.0)
+    {
+        return $this->pageHeight - $y - $h;
     }
 
     /**
@@ -121,7 +136,7 @@ class HighLevelPdf
         $this->currentX = (null === $x) ? $this->getLeftX() : $x;
         $this->currentY = (null === $y) ? $this->getTopY() : $y;
         $this->currentWidth = (null === $w) ? $this->getMaxWidth($this->currentX) : $w;
-        $this->currentHeight = (null === $h) ?: $h;
+        $this->currentHeight = (null === $h) ? $this->currentFontHeight : $h;
 
         return $this;
     }
@@ -150,9 +165,11 @@ class HighLevelPdf
      */
     public function writeTextJustify($text)
     {
+        $y = $this->xformY($this->currentY, $this->currentHeight);
+
         $t = new TextCell(
             $this->currentX,
-            $this->currentY,
+            $y,
             $this->currentWidth,
             $this->currentHeight,
             $this->currentFont,
