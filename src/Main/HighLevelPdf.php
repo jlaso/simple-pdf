@@ -300,10 +300,6 @@ class HighLevelPdf
         $fontDict->addItem('Encoding', new PdfName('MacRomanEncoding'));
         $this->pdf->addObject($fontDict);
 
-        //$resources = new ResourceNode();
-        //$resources->addFont($fontDict);
-        //$this->pdf->addObject($resources);
-
         return $fontDict;
     }
 
