@@ -25,7 +25,9 @@ class Trailer extends AbstractPart implements PartInterface
      */
     public function setSize($size)
     {
-        $this->size = new PdfNumber($size);
+        // +1 because the first entry in xref is bulk
+        $this->size = new PdfNumber($size+1);
+
         return $this;
     }
 

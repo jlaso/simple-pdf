@@ -16,6 +16,6 @@ interface ContentInterface
      * @param Content $content
      * @return void
      */
-    public function addToContent(Content $content);
+    public function addToContent(Content &$content);
 
 }

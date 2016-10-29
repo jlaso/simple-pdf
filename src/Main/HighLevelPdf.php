@@ -3,6 +3,7 @@
 namespace PHPfriends\SimplePdf\Main;
 
 use PHPfriends\SimplePdf\Adaptor\FontFile2FontDict;
+use PHPfriends\SimplePdf\Adaptor\FontManager;
 use PHPfriends\SimplePdf\Events\EventDispatcher;
 use PHPfriends\SimplePdf\Main\Objects\Font;
 use PHPfriends\SimplePdf\Main\Objects\Page;
@@ -23,6 +24,9 @@ use PHPfriends\SimplePdf\Parts\ResourceNode;
 
 class HighLevelPdf
 {
+    /** @var boolean */
+    protected $verbose;
+
     /** @var LowLevelPdf */
     protected $pdf;
 
@@ -33,7 +37,7 @@ class HighLevelPdf
 
     /** @var float outer margin on twoSided or left margin */
     protected $outerMargin = 15.0;
-    /** @var float inner marging on twoSided or right margin */
+    /** @var float inner margin on twoSided or right margin */
     protected $innerMargin = 25.0;
     /** @var float */
     protected $topMargin = 20.0;
@@ -79,12 +83,13 @@ class HighLevelPdf
      * @param float $width
      * @param float $height
      */
-    public function __construct($width, $height)
+    public function __construct($width, $height, $verbose = false)
     {
         $this->pageWidth = $width;
         $this->pageHeight = $height;
         $this->eventDispatcher = new EventDispatcher();
-        $this->pdf = new LowLevelPdf();
+        $this->verbose = $verbose;
+        $this->pdf = new LowLevelPdf($verbose);
         $this->newPage();
     }
 
@@ -118,10 +123,14 @@ class HighLevelPdf
 
     /**
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      */
     public function setMetadata($key, $value)
     {
+        if ('Keywords' === $key) {
+            $this->pdf->setMetadataInfo('AAPL:Keywords', PdfArray::toPdfArrayStrings($value));
+            $value = join(',', $value);
+        }
         $this->pdf->setMetadataInfo($key, $value);
     }
 
@@ -268,8 +277,8 @@ class HighLevelPdf
         $fonts = [];
 
         // add fonts as resources
-        foreach($this->fonts as $key => $font){
-            if(!isset($fonts[$key])) {
+        foreach ($this->fonts as $key => $font) {
+            if (!isset($fonts[$key])) {
                 $fonts[$key] = $this->handleFont($key, $font);
             }
         }
@@ -277,19 +286,29 @@ class HighLevelPdf
         $pagesNode = new PagesNode();
         $this->pdf->addObject($pagesNode);
 
-        foreach($this->pages as $page){
+        foreach ($this->pages as $page) {
             $pageResources = new ResourceNode();
-            foreach($this->resources[$page->getPageNum()]['Font'] as $fontKey => $used) {
-                if($used) {
-                    $pageResources->addFont($fonts[$fontKey]);
+            $contents = $page->getContents();
+            if (count($contents) > 0) {
+                $pageResources->addProcSet('Text');
+            }
+            if (count($this->resources[$page->getPageNum()]['Font']) > 0) {
+                $pageResources->addProcSet('PDF');
+                foreach ($this->resources[$page->getPageNum()]['Font'] as $fontKey => $used) {
+                    if ($used) {
+                        $pageResources->addFont($fonts[$fontKey]);
+                    }
                 }
             }
             $this->pdf->addObject($pageResources);
 
             $pageContents = new Content();
             $pageNode = new PageNode($pagesNode, $pageResources, new Box(0, 0, $this->pageWidth, $this->pageHeight));
-            foreach($page->getContents() as $content){
-                $content->addToContent($pageContents);
+            // @TODO: process graphics
+            if (count($contents) > 0) {
+                foreach ($contents as $content) {
+                    $content->addToContent($pageContents);
+                }
             }
             $pageNode->setContents($pageContents);
             $this->pdf->addObject($pageContents);
@@ -305,8 +324,8 @@ class HighLevelPdf
         $this->pdf->addObject($widths);
 
         $fontDescriptor = $ff2fd->getFontDescriptor();
-        foreach($fontDescriptor->getItems() as $item) {
-            if(method_exists($item,'getReference')) {
+        foreach ($fontDescriptor->getItems() as $item) {
+            if (method_exists($item, 'getReference')) {
                 $this->pdf->addObject($item);
             }
         }
@@ -318,6 +337,7 @@ class HighLevelPdf
         $fontDict->addItem('LastChar', new PdfNumber($widths->getLength() + 32 - 1));
         $fontDict->addItem('FontDescriptor', $fontDescriptor);
         $fontDict->addItem('Encoding', new PdfName('MacRomanEncoding'));
+        //$fontDict->addItem('Encoding', new PdfName('WinAnsiEncoding'));
         $this->pdf->addObject($fontDict);
 
         return $fontDict;
@@ -332,5 +352,9 @@ class HighLevelPdf
         $this->process();
 
         $this->pdf->saveToFile($fileName);
+
+        print "Fonts used:\r\n\r\n" .
+            var_export(FontManager::getInstance()->getAliases(), true) .
+            "\r\n\r\n";
     }
 }

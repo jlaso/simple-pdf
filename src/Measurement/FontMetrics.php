@@ -3,6 +3,7 @@
 namespace PHPfriends\SimplePdf\Measurement;
 
 use FontLib\Font;
+use FontLib\Table\Type\glyf;
 
 class FontMetrics
 {
@@ -267,5 +268,4 @@ class FontMetrics
     {
         return $this->underlinePosition;
     }
-
 }

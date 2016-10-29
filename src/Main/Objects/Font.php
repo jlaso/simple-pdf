@@ -2,6 +2,7 @@
 
 namespace PHPfriends\SimplePdf\Main\Objects;
 
+use PHPfriends\SimplePdf\Adaptor\FontManager;
 use PHPfriends\SimplePdf\Measurement\FontMetrics;
 
 class Font
@@ -12,6 +13,8 @@ class Font
     protected $style;
     /** @var float */
     protected $fontHeight;
+    /** @var string */
+    protected $basename;
 
     /**
      * @param string $name
@@ -23,6 +26,7 @@ class Font
         $this->style = $style;
         $fm = new FontMetrics($name, $style);
         $this->fontHeight = $fm->getFontHeight('bbox');
+        $this->basename = $fm->getBasename();
     }
 
     /**
@@ -78,5 +82,13 @@ class Font
     public function getFontHeight($fontSize)
     {
         return round($this->fontHeight * $fontSize / 1000, 4);
+    }
+
+    /**
+     * @return string
+     */
+    public function getAlias()
+    {
+        return FontManager::getInstance()->addFontName($this->basename);
     }
 }

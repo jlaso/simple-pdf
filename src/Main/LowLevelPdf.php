@@ -28,16 +28,24 @@ class LowLevelPdf
     /** @var MetadataDict */
     protected $metadataDict;
 
+    protected $verbose;
+
     /**
      */
-    public function __construct()
+    public function __construct($verbose = false)
     {
+        $this->verbose = $verbose;
         $this->objects = [];
+
         $this->masterCatalog = new Catalog();
         $this->addObject($this->masterCatalog);
+
         $this->namesCatalog = new NamesCatalog();
         //$this->addObject($this->namesCatalog);
-        $this->trailer = new Trailer();   // Trailer is not an object
+
+        $this->trailer = new Trailer();
+        // don't insert trailer, is not an object as the rest
+
         $this->metadataDict = new MetadataDict();
         $this->addObject($this->metadataDict);
     }
@@ -49,7 +57,7 @@ class LowLevelPdf
     public function addObject($obj)
     {
         $id = count($this->objects) + 1;
-        $object = new ObjectNode($id);
+        $object = new ObjectNode($id, 0, $this->verbose);
         $object->setContent($obj);
         if (method_exists($obj, 'injectObject')) {
             $obj->injectObject($object);
@@ -79,6 +87,9 @@ class LowLevelPdf
         switch (true){
             case is_string($value):
                 $value = new PdfString($value);
+                break;
+
+            case $value instanceof PartInterface:
                 break;
 
             default:

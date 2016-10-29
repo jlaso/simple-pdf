@@ -50,7 +50,7 @@ class FontFile2FontDict
         $widths = $fontTool->getWidths();
         $this->widths = new Widths($widths);
 
-        $this->baseName = $fontTool->getBasename();
+        $this->baseName = /*'A'.substr(strtoupper(uniqid()),-5) .'+'.*/ $fontTool->getBasename();
         $this->fontBBox = $fontTool->getFontBBox();
         $this->ascent = $fontTool->getAscender();
         $this->descent = $fontTool->getDescender();
@@ -107,7 +107,8 @@ class FontFile2FontDict
         $fdd->addItem('ItalicAngle', new PdfNumber($this->italicAngle));
         $fdd->addItem('Ascent', new PdfNumber($this->ascent));
         $fdd->addItem('Descent', new PdfNumber($this->descent));
-        $fdd->addItem('CapHeight', new PdfNumber(0));
+        $height = abs($this->fontBBox['yMax'] /*- $this->fontBBox['yMin']*/);
+        $fdd->addItem('CapHeight', new PdfNumber($height));
         $fdd->addItem('StemV', new PdfNumber(0));
         $fdd->addItem('Flags', new PdfNumber(32));
         $fdd->addItem('FontFile2', new FontFileStream($this->fontFile));

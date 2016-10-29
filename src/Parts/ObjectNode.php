@@ -10,15 +10,18 @@ class ObjectNode extends AbstractPart implements PartInterface
     protected $generation;
     /** @var PartInterface */
     protected $content;
+    /** @var bool */
+    protected $verbose;
 
     /**
      * @param int $id
      * @param int $generation
      */
-    public function __construct($id, $generation = 0)
+    public function __construct($id, $generation = 0, $verbose = false)
     {
         $this->id = $id;
         $this->generation = $generation;
+        $this->verbose = $verbose;
     }
 
     /**
@@ -50,10 +53,18 @@ class ObjectNode extends AbstractPart implements PartInterface
      */
     public function dump()
     {
+        $comment = '';
+        if($this->verbose){
+            $comment = method_exists($this->content,'getComment') ?
+                $this->content->getComment() :
+                preg_replace("/PHPfriends\\\SimplePdf\\\/", "", get_class($this->content));
+            $comment = "   % {$comment}";
+        }
         return sprintf(
-            "%d %d obj\r\n%s\r\nendobj\r\n",
+            "%d %d obj%s\r\n%s\r\nendobj\r\n",
             $this->id,
             $this->generation,
+            $comment,
             rtrim($this->content->dump())
         );
     }

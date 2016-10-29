@@ -21,7 +21,7 @@ class Page
     /**
      * @param ContentInterface $content
      */
-    public function addContent(ContentInterface $content)
+    public function addContent(ContentInterface &$content)
     {
         $this->contents[] = $content;
     }

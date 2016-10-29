@@ -18,3 +18,7 @@ https://en.wikipedia.org/wiki/Portable_Document_Format
 ### Hand-coded PDF tutorial 
 
 https://brendanzagaeski.appspot.com/0005.html
+
+### Truetype reference
+
+https://developer.apple.com/fonts/TrueType-Reference-Manual

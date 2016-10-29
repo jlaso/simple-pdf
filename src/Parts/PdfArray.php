@@ -21,6 +21,20 @@ class PdfArray implements PartInterface
         return $result;
     }
 
+    /**
+     * @param string[] $strings
+     * @return PdfArray
+     */
+    public static function toPdfArrayStrings($strings)
+    {
+        $result = new PdfArray();
+        foreach($strings as $string){
+            $result->addItem(new PdfString($string));
+        }
+
+        return $result;
+    }
+
     public function addItem(PartInterface $item)
     {
         $this->values[] = $item;

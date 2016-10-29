@@ -2,6 +2,8 @@
 
 namespace PHPfriends\SimplePdf\Parts;
 
+use PHPfriends\SimplePdf\Adaptor\FontManager;
+
 class FontDict extends ConstrainedDictionary
 {
     use LazyReferenceTrait;
@@ -27,9 +29,10 @@ class FontDict extends ConstrainedDictionary
     const SYMBOL = 'Symbol';
     const ZAPDINGBATS = 'ZapfDingbats';
 
-
     /** @var string */
     protected $name;
+    /** @var string */
+    protected $baseFont;
 
     protected $allowed = [
         'Subtype' => [
@@ -57,6 +60,7 @@ class FontDict extends ConstrainedDictionary
     public function __construct($name, $subType, $baseFont)
     {
         $this->name = $name;
+        $this->baseFont = $baseFont;
 
         parent::__construct();
 
@@ -71,6 +75,14 @@ class FontDict extends ConstrainedDictionary
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAlias()
+    {
+        return FontManager::getInstance()->addFontName($this->baseFont);
     }
 
 }

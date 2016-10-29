@@ -29,7 +29,7 @@ class FontDictTruetype extends FontDict
         ],
         'Encoding' => [
             'required' => false,
-            'options' => [ 'MacRomanEncoding' ],
+            'options' => [ 'MacRomanEncoding', 'WinAnsiEncoding' ],
         ]
     ];
 

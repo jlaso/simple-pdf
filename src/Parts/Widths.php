@@ -6,7 +6,7 @@ use PHPfriends\SimplePdf\Exceptions\ValueNotValidOnDictException;
 
 class Widths implements PartInterface
 {
-    //use LazyReferenceTrait;
+    use LazyReferenceTrait;
 
     /** @var int[] */
     protected $values;
