@@ -3,14 +3,14 @@
 namespace PHPfriends\SimplePdf\Adaptor;
 
 use PHPfriends\SimplePdf\Measurement\FontMetrics;
-use PHPfriends\SimplePdf\Parts\Box;
-use PHPfriends\SimplePdf\Parts\FontDescriptorDict;
-use PHPfriends\SimplePdf\Parts\FontDict as FontDict;
+use PHPfriends\SimplePdf\LowLevelParts\Box;
+use PHPfriends\SimplePdf\LowLevelParts\FontDescriptorDict;
+use PHPfriends\SimplePdf\LowLevelParts\FontDict as FontDict;
 use FontLib\Font as FontLibFont;
-use PHPfriends\SimplePdf\Parts\FontFileStream;
-use PHPfriends\SimplePdf\Parts\PdfName;
-use PHPfriends\SimplePdf\Parts\PdfNumber;
-use PHPfriends\SimplePdf\Parts\Widths;
+use PHPfriends\SimplePdf\LowLevelParts\FontFileStream;
+use PHPfriends\SimplePdf\LowLevelParts\PdfName;
+use PHPfriends\SimplePdf\LowLevelParts\PdfNumber;
+use PHPfriends\SimplePdf\LowLevelParts\Widths;
 
 class FontFile2FontDict
 {
@@ -50,7 +50,7 @@ class FontFile2FontDict
         $widths = $fontTool->getWidths();
         $this->widths = new Widths($widths);
 
-        $this->baseName = /*'A'.substr(strtoupper(uniqid()),-5) .'+'.*/ $fontTool->getBasename();
+        $this->baseName = $fontTool->getBasename();
         $this->fontBBox = $fontTool->getFontBBox();
         $this->ascent = $fontTool->getAscender();
         $this->descent = $fontTool->getDescender();
@@ -107,10 +107,17 @@ class FontFile2FontDict
         $fdd->addItem('ItalicAngle', new PdfNumber($this->italicAngle));
         $fdd->addItem('Ascent', new PdfNumber($this->ascent));
         $fdd->addItem('Descent', new PdfNumber($this->descent));
+
+        // @TODO extract the right CapHeight from the font folder, this is an approach only
         $height = abs($this->fontBBox['yMax'] /*- $this->fontBBox['yMin']*/);
         $fdd->addItem('CapHeight', new PdfNumber($height));
+
+        // @TODO extract the right StemV from the font file
         $fdd->addItem('StemV', new PdfNumber(0));
+
+        //@TODO extract the rights flags from the font file
         $fdd->addItem('Flags', new PdfNumber(32));
+
         $fdd->addItem('FontFile2', new FontFileStream($this->fontFile));
 
         return $fdd;

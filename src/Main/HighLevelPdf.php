@@ -5,22 +5,18 @@ namespace PHPfriends\SimplePdf\Main;
 use PHPfriends\SimplePdf\Adaptor\FontFile2FontDict;
 use PHPfriends\SimplePdf\Adaptor\FontManager;
 use PHPfriends\SimplePdf\Events\EventDispatcher;
-use PHPfriends\SimplePdf\Main\Objects\Font;
-use PHPfriends\SimplePdf\Main\Objects\Page;
-use PHPfriends\SimplePdf\Main\Objects\TextCell;
-use PHPfriends\SimplePdf\Parts\Box;
-use PHPfriends\SimplePdf\Parts\Content;
-use PHPfriends\SimplePdf\Parts\Dictionary;
-use PHPfriends\SimplePdf\Parts\FontDescriptorDict;
-use PHPfriends\SimplePdf\Parts\FontDict;
-use PHPfriends\SimplePdf\Parts\FontDictTruetype;
-use PHPfriends\SimplePdf\Parts\NeedsObject;
-use PHPfriends\SimplePdf\Parts\PageNode;
-use PHPfriends\SimplePdf\Parts\PagesNode;
-use PHPfriends\SimplePdf\Parts\PdfArray;
-use PHPfriends\SimplePdf\Parts\PdfName;
-use PHPfriends\SimplePdf\Parts\PdfNumber;
-use PHPfriends\SimplePdf\Parts\ResourceNode;
+use PHPfriends\SimplePdf\HighLevelObjects\Font;
+use PHPfriends\SimplePdf\HighLevelObjects\Page;
+use PHPfriends\SimplePdf\HighLevelObjects\TextCell;
+use PHPfriends\SimplePdf\LowLevelParts\Box;
+use PHPfriends\SimplePdf\LowLevelParts\Content;
+use PHPfriends\SimplePdf\LowLevelParts\FontDictTruetype;
+use PHPfriends\SimplePdf\LowLevelParts\PageNode;
+use PHPfriends\SimplePdf\LowLevelParts\PagesNode;
+use PHPfriends\SimplePdf\LowLevelParts\PdfArray;
+use PHPfriends\SimplePdf\LowLevelParts\PdfName;
+use PHPfriends\SimplePdf\LowLevelParts\PdfNumber;
+use PHPfriends\SimplePdf\LowLevelParts\ResourceNode;
 
 class HighLevelPdf
 {
@@ -316,6 +312,11 @@ class HighLevelPdf
         }
     }
 
+    /**
+     * @param string $key
+     * @param Font $font
+     * @return FontDictTruetype
+     */
     private function handleFont($key, Font $font)
     {
         $ff2fd = new FontFile2FontDict($font->getName(), $font->getStyle());
@@ -353,8 +354,10 @@ class HighLevelPdf
 
         $this->pdf->saveToFile($fileName);
 
-        print "Fonts used:\r\n\r\n" .
-            var_export(FontManager::getInstance()->getAliases(), true) .
-            "\r\n\r\n";
+        if ($this->verbose) {
+            print "Fonts used:\r\n\r\n" .
+                var_export(FontManager::getInstance()->getAliases(), true) .
+                "\r\n\r\n";
+        }
     }
 }

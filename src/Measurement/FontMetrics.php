@@ -3,7 +3,6 @@
 namespace PHPfriends\SimplePdf\Measurement;
 
 use FontLib\Font;
-use FontLib\Table\Type\glyf;
 
 class FontMetrics
 {
@@ -23,22 +22,51 @@ class FontMetrics
     protected $lastChar = 127;
     /** @var string */
     private $fontFile;
-    /** @var array */
-    protected $os2;
     /** @var string */
     protected $baseName;
 
+    // https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6OS2.html
+    // The 'OS/2' table consists of a set of metrics that are required by and Windows
+    protected $os2;
+
+    // https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6hmtx.html
+    // The 'hmtx' table contains metric information for the horizontal layout each of the glyphs in the font.
     protected $hmtx;
+
+    // https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6head.html
+    // The 'head' table contains global information about the font.
     protected $head;
-    protected $fontBBox;
+
+    // https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6hhea.html
+    // The 'hhea' table contains information needed to layout fonts whose characters are written horizontally
     protected $hhea;
-    protected $ascent;
-    protected $descent;
-    protected $post;
-    protected $italicAngle;
+
+    // https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6cmap.html
+    // The 'cmap' table maps character codes to glyph indices
     protected $cmap;
+
+    // https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6post.html
+    // The 'post' table contains information needed to use a TrueType font on a PostScript printer
+    protected $post;
+
+    protected $fontBBox;
+
+    // Distance from baseline of highest ascender
+    protected $ascent;
+
+    // Distance from baseline of lowest descender
+    protected $descent;
+
+    // Italic angle in degrees
+    protected $italicAngle;
+
+    // typographic line gap
     protected $heightOffset;
+
+    // 	Underline thickness
     protected $underlineThickness;
+
+    // 	Underline position
     protected $underlinePosition;
 
     /**
@@ -241,6 +269,7 @@ class FontMetrics
     {
         switch ($type){
             case 'cap':
+                // @TODO, no idea so far how to get that
                 break;
 
             case 'offset':

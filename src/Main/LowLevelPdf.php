@@ -3,15 +3,15 @@
 namespace PHPfriends\SimplePdf\Main;
 
 use PHPfriends\SimplePdf\Exceptions\ReferenceNotResolved;
-use PHPfriends\SimplePdf\Parts\Catalog;
-use PHPfriends\SimplePdf\Parts\CrossRefTable;
-use PHPfriends\SimplePdf\Parts\MetadataDict;
-use PHPfriends\SimplePdf\Parts\NamesCatalog;
-use PHPfriends\SimplePdf\Parts\ObjectNode;
-use PHPfriends\SimplePdf\Parts\PagesNode;
-use PHPfriends\SimplePdf\Parts\PartInterface;
-use PHPfriends\SimplePdf\Parts\PdfString;
-use PHPfriends\SimplePdf\Parts\Trailer;
+use PHPfriends\SimplePdf\LowLevelParts\Catalog;
+use PHPfriends\SimplePdf\LowLevelParts\CrossRefTable;
+use PHPfriends\SimplePdf\LowLevelParts\MetadataDict;
+use PHPfriends\SimplePdf\LowLevelParts\NamesCatalog;
+use PHPfriends\SimplePdf\LowLevelParts\ObjectNode;
+use PHPfriends\SimplePdf\LowLevelParts\PagesNode;
+use PHPfriends\SimplePdf\LowLevelParts\PartInterface;
+use PHPfriends\SimplePdf\LowLevelParts\PdfString;
+use PHPfriends\SimplePdf\LowLevelParts\Trailer;
 
 class LowLevelPdf
 {

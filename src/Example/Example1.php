@@ -5,12 +5,12 @@ namespace PHPfriends\SimplePdf\Example;
 include __DIR__.'/../../vendor/autoload.php';
 
 use PHPfriends\SimplePdf\Main\LowLevelPdf;
-use PHPfriends\SimplePdf\Parts\Box;
-use PHPfriends\SimplePdf\Parts\Content;
-use PHPfriends\SimplePdf\Parts\FontDict;
-use PHPfriends\SimplePdf\Parts\PageNode;
-use PHPfriends\SimplePdf\Parts\PagesNode;
-use PHPfriends\SimplePdf\Parts\ResourceNode;
+use PHPfriends\SimplePdf\LowLevelParts\Box;
+use PHPfriends\SimplePdf\LowLevelParts\Content;
+use PHPfriends\SimplePdf\LowLevelParts\FontDict;
+use PHPfriends\SimplePdf\LowLevelParts\PageNode;
+use PHPfriends\SimplePdf\LowLevelParts\PagesNode;
+use PHPfriends\SimplePdf\LowLevelParts\ResourceNode;
 
 class Example1
 {
