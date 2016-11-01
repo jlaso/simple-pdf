@@ -10,3 +10,4 @@ src/Example/*.pdf
 cache/*.cached
 cache/*.json
 cache/*.php
+cache/*.pdf

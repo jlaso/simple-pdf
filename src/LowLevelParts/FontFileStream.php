@@ -47,9 +47,11 @@ class FontFileStream implements PartInterface
 
         $header->addItem('Length1', new PdfNumber($length));
 
+        // @TODO: create a factory
         $filter = new FlateDecodeFilter();
         $stream = $filter->filter($stream);
 
+        $header->addItem('Filter', new PdfName($filter->getName()));
         $header->addItem('Length', new PdfNumber(strlen($stream)));
 
         return $header->dump()."\r\n".

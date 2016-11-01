@@ -10,6 +10,14 @@ class FlateDecodeFilter implements FilterInterface
      */
     public function filter($data)
     {
-        return gzcompress($data);
+        return gzcompress($data, 9, ZLIB_ENCODING_DEFLATE);
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'FlateDecode';
     }
 }
