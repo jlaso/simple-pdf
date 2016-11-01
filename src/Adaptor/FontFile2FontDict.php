@@ -34,6 +34,7 @@ class FontFile2FontDict
     protected $descent;
     protected $italicAngle;
     protected $cmap;
+    protected $fixedWidth;
 
     /**
      * @param string $name
@@ -49,6 +50,12 @@ class FontFile2FontDict
 
         $widths = $fontTool->getWidths();
         $this->widths = new Widths($widths);
+        $min = 1000; $max = 0;
+        foreach($widths as $width){
+            $min = min($min, $width);
+            $max = max($max, $widths);
+        }
+        $this->fixedWidth = ($max == $min);
 
         $this->baseName = $fontTool->getBasename();
         $this->fontBBox = $fontTool->getFontBBox();
@@ -115,11 +122,47 @@ class FontFile2FontDict
         // @TODO extract the right StemV from the font file
         $fdd->addItem('StemV', new PdfNumber(0));
 
-        //@TODO extract the rights flags from the font file
-        $fdd->addItem('Flags', new PdfNumber(32));
+        $fdd->addItem('Flags', new PdfNumber($this->calcFlags()));
 
         $fdd->addItem('FontFile2', new FontFileStream($this->fontFile));
 
         return $fdd;
+    }
+
+    /**
+     * //@TODO extract the rights flags from the font file
+     *
+     * @return int
+     */
+    private function calcFlags()
+    {
+        $flags = [
+            'FixedPitch'    => 0b0000000010,  //  2
+            'Serif'         => 0b0000000100,  //  4
+            'Symbolic'      => 0b0000001000,  //  8
+            'Script'        => 0b0000010000,  // 16
+            'Nonsymbolic'   => 0b0000100000,  // 32
+            'Italic'        => 0b0001000000,  // 64
+            'AllCap'        => 0b0010000000,  //128
+            'SmallCap'      => 0b0100000000,  //256
+            'ForceBold'     => 0b1000000000,  //512
+        ];
+        $result = 0;
+
+        if ($this->widths->getLength() > (255-32+1)) {
+            $result |= $flags['Symbolic'];
+        }else {
+            $result |= $flags['Nonsymbolic'];
+        }
+
+        if ($this->fixedWidth) {
+             $result |= $flags['FixedPitch'];
+        }
+
+        if ($this->italicAngle > 200) {
+            $result |= $flags['Italic'];
+        }
+
+        return $result;
     }
 }

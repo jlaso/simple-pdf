@@ -30,12 +30,12 @@ class Example4
         $pdf->setMetadata('CreationDate', new PdfDate());
         $pdf->setMetadata('Keywords', ['simple-pdf','example','PHPfriends']);
 
-        $pdf->setFont('Ah_Natural', 'Regular', 48);
+        $pdf->setFont('Ah_Natural', 'Regular', 96);
         $pdf->setCell();
         $pdf->writeTextJustify('Hello world !');
 
-        $pdf->setFont('Oh_Script', 'Regular', 56);
-        $pdf->setCell(null, 100);
+        $pdf->setFont('Oh_Script', 'Regular', 24);
+        $pdf->setCell(null, 150);
         $pdf->writeTextJustify('Hello world !');
 
 

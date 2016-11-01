@@ -19,4 +19,9 @@ interface FilterInterface
      * @return string
      */
     public function filter($data);
+
+    /**
+     * @return string
+     */
+    public function getName();
 }

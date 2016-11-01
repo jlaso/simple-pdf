@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPfriends\SimplePdf\Parts;
+namespace PHPfriends\SimplePdf\LowLevelParts;
 
 class DictionaryTest extends \PHPUnit_Framework_TestCase
 {
