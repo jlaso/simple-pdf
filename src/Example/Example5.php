@@ -14,7 +14,7 @@ use PHPfriends\SimplePdf\LowLevelParts\PagesNode;
 use PHPfriends\SimplePdf\LowLevelParts\PdfDate;
 use PHPfriends\SimplePdf\LowLevelParts\ResourceNode;
 
-class Example4 extends AbstractExample
+class Example5 extends AbstractExample
 {
     protected $pdf;
     protected $verbose = true;
@@ -30,17 +30,13 @@ class Example4 extends AbstractExample
         $pdf->setMetadata('CreationDate', new PdfDate());
         $pdf->setMetadata('Keywords', ['simple-pdf','example','PHPfriends']);
 
-        $pdf->setFont('Ah_Natural', 'Regular', 96);
+        //$pdf->setFont('FreeUniversal', 'Regular', 24);
+        $pdf->setFont('Lato', 'Regular', 24);
         $pdf->setCell();
-        $pdf->writeTextJustify('Hello world !');
+        $pdf->writeTextJustify('This is a long text. The idea is trying to use all the room possible in a single row and get the next row justifying! do you thing that will going to be possible ? Let\'s try and will see.');
 
-        $pdf->setFont('Oh_Script', 'Regular', 24);
-        $pdf->setCell(null, 150);
-        $pdf->writeTextJustify('Hello world !');
-
-
-        $pdf->saveToFile(__DIR__.'/test4.pdf');
+        $pdf->saveToFile(__DIR__.'/test5.pdf');
     }
 }
 
-Example4::main();
+Example5::main();

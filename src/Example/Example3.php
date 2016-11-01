@@ -7,7 +7,7 @@ include __DIR__.'/../../vendor/autoload.php';
 /**
  * Testing hyphenation
  */
-class Example3
+class Example3 extends AbstractExample
 {
     public function process()
     {
@@ -21,13 +21,6 @@ class Example3
         $syllable->setLanguage('es');
         echo $syllable->hyphenateText('Este año va a hacer más calor que el año pasado')."\r\n";
     }
-
-    public static function main()
-    {
-        $o = new Example3();
-        $o->process();
-    }
 }
 
 Example3::main();
-echo "Done! \n";

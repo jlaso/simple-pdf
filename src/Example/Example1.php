@@ -12,7 +12,7 @@ use PHPfriends\SimplePdf\LowLevelParts\PageNode;
 use PHPfriends\SimplePdf\LowLevelParts\PagesNode;
 use PHPfriends\SimplePdf\LowLevelParts\ResourceNode;
 
-class Example1
+class Example1 extends AbstractExample
 {
     protected $pdf;
 
@@ -56,13 +56,6 @@ class Example1
 
         $pdf->saveToFile(__DIR__.'/test.pdf');
     }
-
-    public static function main()
-    {
-        $o = new Example1();
-        $o->process();
-    }
 }
 
 Example1::main();
-echo "Done! \n";
