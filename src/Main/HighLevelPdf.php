@@ -3,25 +3,26 @@
 namespace PHPfriends\SimplePdf\Main;
 
 use PHPfriends\SimplePdf\Adaptor\FontFile2FontDict;
+use PHPfriends\SimplePdf\Adaptor\FontManager;
 use PHPfriends\SimplePdf\Events\EventDispatcher;
-use PHPfriends\SimplePdf\Main\Objects\Font;
-use PHPfriends\SimplePdf\Main\Objects\Page;
-use PHPfriends\SimplePdf\Main\Objects\TextCell;
-use PHPfriends\SimplePdf\Parts\Box;
-use PHPfriends\SimplePdf\Parts\Dictionary;
-use PHPfriends\SimplePdf\Parts\FontDescriptorDict;
-use PHPfriends\SimplePdf\Parts\FontDict;
-use PHPfriends\SimplePdf\Parts\FontDictTruetype;
-use PHPfriends\SimplePdf\Parts\NeedsObject;
-use PHPfriends\SimplePdf\Parts\PageNode;
-use PHPfriends\SimplePdf\Parts\PagesNode;
-use PHPfriends\SimplePdf\Parts\PdfArray;
-use PHPfriends\SimplePdf\Parts\PdfName;
-use PHPfriends\SimplePdf\Parts\PdfNumber;
-use PHPfriends\SimplePdf\Parts\ResourceNode;
+use PHPfriends\SimplePdf\HighLevelObjects\Font;
+use PHPfriends\SimplePdf\HighLevelObjects\Page;
+use PHPfriends\SimplePdf\HighLevelObjects\TextCell;
+use PHPfriends\SimplePdf\LowLevelParts\Box;
+use PHPfriends\SimplePdf\LowLevelParts\Content;
+use PHPfriends\SimplePdf\LowLevelParts\FontDictTruetype;
+use PHPfriends\SimplePdf\LowLevelParts\PageNode;
+use PHPfriends\SimplePdf\LowLevelParts\PagesNode;
+use PHPfriends\SimplePdf\LowLevelParts\PdfArray;
+use PHPfriends\SimplePdf\LowLevelParts\PdfName;
+use PHPfriends\SimplePdf\LowLevelParts\PdfNumber;
+use PHPfriends\SimplePdf\LowLevelParts\ResourceNode;
 
 class HighLevelPdf
 {
+    /** @var boolean */
+    protected $verbose;
+
     /** @var LowLevelPdf */
     protected $pdf;
 
@@ -32,7 +33,7 @@ class HighLevelPdf
 
     /** @var float outer margin on twoSided or left margin */
     protected $outerMargin = 15.0;
-    /** @var float inner marging on twoSided or right margin */
+    /** @var float inner margin on twoSided or right margin */
     protected $innerMargin = 25.0;
     /** @var float */
     protected $topMargin = 20.0;
@@ -62,6 +63,8 @@ class HighLevelPdf
     protected $currentFont;
     /** @var float */
     protected $currentFontSize;
+    /** @var float */
+    protected $currentFontHeight;
     /** @var Page[] */
     protected $pages;
     /** @var Page */
@@ -76,13 +79,27 @@ class HighLevelPdf
      * @param float $width
      * @param float $height
      */
-    public function __construct($width, $height)
+    public function __construct($width, $height, $verbose = false)
     {
         $this->pageWidth = $width;
         $this->pageHeight = $height;
         $this->eventDispatcher = new EventDispatcher();
-        $this->pdf = new LowLevelPdf();
+        $this->verbose = $verbose;
+        $this->pdf = new LowLevelPdf($verbose);
         $this->newPage();
+    }
+
+    /**
+     * transforms Y in order to maintain a virtual coordinate system based on
+     * top-left corner is the (0,0) origin
+     *
+     * @param float $y
+     * @param float $h
+     * @return float
+     */
+    public function xformY($y, $h = 0.0)
+    {
+        return $this->pageHeight - $y - $h;
     }
 
     /**
@@ -102,10 +119,14 @@ class HighLevelPdf
 
     /**
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      */
     public function setMetadata($key, $value)
     {
+        if ('Keywords' === $key) {
+            $this->pdf->setMetadataInfo('AAPL:Keywords', PdfArray::toPdfArrayStrings($value));
+            $value = join(',', $value);
+        }
         $this->pdf->setMetadataInfo($key, $value);
     }
 
@@ -121,7 +142,7 @@ class HighLevelPdf
         $this->currentX = (null === $x) ? $this->getLeftX() : $x;
         $this->currentY = (null === $y) ? $this->getTopY() : $y;
         $this->currentWidth = (null === $w) ? $this->getMaxWidth($this->currentX) : $w;
-        $this->currentHeight = (null === $h) ?: $h;
+        $this->currentHeight = (null === $h) ? $this->currentFontHeight : $h;
 
         return $this;
     }
@@ -135,6 +156,7 @@ class HighLevelPdf
     public function setFont($font, $style, $size)
     {
         $this->currentFont = new Font($font, $style);
+        $this->currentFontHeight = $this->currentFont->getFontHeight($size);
         $key = $this->currentFont->getFontName();
         // store font in order to include later in PDF file
         $this->fonts[$key] = $this->currentFont;
@@ -150,9 +172,11 @@ class HighLevelPdf
      */
     public function writeTextJustify($text)
     {
+        $y = $this->xformY($this->currentY, $this->currentHeight);
+
         $t = new TextCell(
             $this->currentX,
-            $this->currentY,
+            $y,
             $this->currentWidth,
             $this->currentHeight,
             $this->currentFont,
@@ -249,8 +273,8 @@ class HighLevelPdf
         $fonts = [];
 
         // add fonts as resources
-        foreach($this->fonts as $key => $font){
-            if(!isset($fonts[$key])) {
+        foreach ($this->fonts as $key => $font) {
+            if (!isset($fonts[$key])) {
                 $fonts[$key] = $this->handleFont($key, $font);
             }
         }
@@ -258,25 +282,41 @@ class HighLevelPdf
         $pagesNode = new PagesNode();
         $this->pdf->addObject($pagesNode);
 
-        foreach($this->pages as $page){
+        foreach ($this->pages as $page) {
             $pageResources = new ResourceNode();
-            foreach($this->resources[$page->getPageNum()]['Font'] as $fontKey => $used) {
-                if($used) {
-                    $pageResources->addFont($fonts[$fontKey]);
+            $contents = $page->getContents();
+            if (count($contents) > 0) {
+                $pageResources->addProcSet('Text');
+            }
+            if (count($this->resources[$page->getPageNum()]['Font']) > 0) {
+                $pageResources->addProcSet('PDF');
+                foreach ($this->resources[$page->getPageNum()]['Font'] as $fontKey => $used) {
+                    if ($used) {
+                        $pageResources->addFont($fonts[$fontKey]);
+                    }
                 }
             }
             $this->pdf->addObject($pageResources);
 
+            $pageContents = new Content();
             $pageNode = new PageNode($pagesNode, $pageResources, new Box(0, 0, $this->pageWidth, $this->pageHeight));
-            foreach($page->getContents() as $content){
-                $c = $content->dump($this->pdf);
-                $pageNode->setContents($c);
-                $this->pdf->addObject($c);
+            // @TODO: process graphics
+            if (count($contents) > 0) {
+                foreach ($contents as $content) {
+                    $content->addToContent($pageContents);
+                }
             }
+            $pageNode->setContents($pageContents);
+            $this->pdf->addObject($pageContents);
             $this->pdf->addObject($pageNode);
         }
     }
 
+    /**
+     * @param string $key
+     * @param Font $font
+     * @return FontDictTruetype
+     */
     private function handleFont($key, Font $font)
     {
         $ff2fd = new FontFile2FontDict($font->getName(), $font->getStyle());
@@ -285,8 +325,8 @@ class HighLevelPdf
         $this->pdf->addObject($widths);
 
         $fontDescriptor = $ff2fd->getFontDescriptor();
-        foreach($fontDescriptor->getItems() as $item) {
-            if(method_exists($item,'getReference')) {
+        foreach ($fontDescriptor->getItems() as $item) {
+            if (method_exists($item, 'getReference')) {
                 $this->pdf->addObject($item);
             }
         }
@@ -295,9 +335,10 @@ class HighLevelPdf
         $fontDict = new FontDictTruetype($key, $ff2fd->getBaseName());
         $fontDict->addItem('Widths', $widths);
         $fontDict->addItem('FirstChar', new PdfNumber(32));
-        $fontDict->addItem('LastChar', new PdfNumber($widths->getLength() + 32 + 1));
+        $fontDict->addItem('LastChar', new PdfNumber($widths->getLength() + 32 - 1));
         $fontDict->addItem('FontDescriptor', $fontDescriptor);
         $fontDict->addItem('Encoding', new PdfName('MacRomanEncoding'));
+        //$fontDict->addItem('Encoding', new PdfName('WinAnsiEncoding'));
         $this->pdf->addObject($fontDict);
 
         return $fontDict;
@@ -312,5 +353,11 @@ class HighLevelPdf
         $this->process();
 
         $this->pdf->saveToFile($fileName);
+
+        if ($this->verbose) {
+            print "Fonts used:\r\n\r\n" .
+                var_export(FontManager::getInstance()->getAliases(), true) .
+                "\r\n\r\n";
+        }
     }
 }
