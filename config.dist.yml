@@ -1,0 +1,3 @@
+hyphenation:
+    language: en-us
+    hyphen: "\xAD"

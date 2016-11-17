@@ -18,6 +18,10 @@ class TextCell implements ContentInterface
     protected $font;
     /** @var float */
     protected $fontSize;
+    /** @var float */
+    protected $charSpace;
+    /** @var float */
+    protected $wordSpace;
 
     /** @var string */
     protected $text;
@@ -40,6 +44,24 @@ class TextCell implements ContentInterface
         $this->font = $font;
         $this->fontSize = $fontSize;
         $this->text = $text;
+        $this->charSpace = null;
+        $this->wordSpace = null;
+    }
+
+    /**
+     * @param float $charSpace
+     */
+    public function setCharSpace($charSpace)
+    {
+        $this->charSpace = $charSpace;
+    }
+
+    /**
+     * @param float $wordSpace
+     */
+    public function setWordSpace($wordSpace)
+    {
+        $this->wordSpace = $wordSpace;
     }
 
     /**
@@ -59,6 +81,9 @@ class TextCell implements ContentInterface
      */
     public function addToContent(Content &$content)
     {
-        $content->addText($this->x, $this->y, $this->font, $this->fontSize, $this->text);
+        $options = [];
+        $this->charSpace && $options['char_spacing'] = $this->charSpace;
+        $this->wordSpace && $options['word_spacing'] = $this->wordSpace;
+        $content->addText($this->x, $this->y, $this->font, $this->fontSize, $this->text, $options);
     }
 }

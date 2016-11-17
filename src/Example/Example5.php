@@ -4,6 +4,7 @@ namespace PHPfriends\SimplePdf\Example;
 
 include __DIR__.'/../../vendor/autoload.php';
 
+use PHPfriends\SimplePdf\Adaptor\SyllableAdaptor;
 use PHPfriends\SimplePdf\Main\HighLevelPdf;
 use PHPfriends\SimplePdf\Main\LowLevelPdf;
 use PHPfriends\SimplePdf\LowLevelParts\Box;
@@ -22,8 +23,9 @@ class Example5 extends AbstractExample
     public function process()
     {
         $pdf = new HighLevelPdf(612.0, 792.0, $this->verbose);
+        $pdf->setHyphenator(new SyllableAdaptor());
 
-        $pdf->setMetadata('Title', 'Example 4 @ High Level');
+        $pdf->setMetadata('Title', 'Example 5 @ High Level');
         $pdf->setMetadata('Author', '@PHPfriendsTK');
         $pdf->setMetadata('Creator', 'https://github.com/PHPfriends/simple-pdf');
         $pdf->setMetadata('Producer', 'https://packagist.org/packages/phpfriends/simple-pdf');
@@ -33,7 +35,10 @@ class Example5 extends AbstractExample
         //$pdf->setFont('FreeUniversal', 'Regular', 24);
         $pdf->setFont('Lato', 'Regular', 24);
         $pdf->setCell();
-        $pdf->writeTextJustify('This is a long text. The idea is trying to use all the room possible in a single row and get the next row justifying! do you thing that will going to be possible ? Let\'s try and will see.');
+        $text = <<<EOD
+This is a long text. The idea is trying to use all the room possible in a single row and get the next row justifying! do you thing that will going to be possible ? Let\'s try and will see.
+EOD;
+        $pdf->writeTextJustify($text, 'en-us');
 
         $pdf->saveToFile(__DIR__.'/test5.pdf');
     }
