@@ -8,6 +8,7 @@ use PHPfriends\SimplePdf\Adaptor\HyphenatorInterface;
 use PHPfriends\SimplePdf\Events\EventDispatcher;
 use PHPfriends\SimplePdf\HighLevelObjects\Font;
 use PHPfriends\SimplePdf\HighLevelObjects\Page;
+use PHPfriends\SimplePdf\HighLevelObjects\Rectangle;
 use PHPfriends\SimplePdf\HighLevelObjects\TextCell;
 use PHPfriends\SimplePdf\LowLevelParts\Box;
 use PHPfriends\SimplePdf\LowLevelParts\Content;
@@ -178,7 +179,6 @@ class HighLevelPdf
             $fontTool = new FontMetrics($name, $style);
             $this->fontsWidths[$name][$style] = $fontTool->getWidths();
         }
-        print_r($this->fontsWidths[$name][$style]);
 
         return $this->fontsWidths[$name][$style];
     }
@@ -239,11 +239,13 @@ class HighLevelPdf
         $toPrint = '';
         $hyphen = $this->hyphenator ? $this->hyphenator->getHyphen() : null;
 
-        $matchHyphen = function(&$text) use ($hyphen) {
-            if($hyphen && (substr($text, 0, strlen($hyphen)) == $hyphen)){
+        $matchHyphen = function (&$text) use ($hyphen) {
+            if ($hyphen && (substr($text, 0, strlen($hyphen)) == $hyphen)) {
                 $text = substr($text, strlen($hyphen));
+
                 return true;
             }
+
             return false;
         };
 
@@ -253,14 +255,54 @@ class HighLevelPdf
             return $this->realSize(isset($widths[$char]) ? $widths[$char] : $widths[32]);
         };
 
+        $lastHyphenable = null;
+        $hyphenWidth = $getRealWidth('-');
+        $spaceWidth = $getRealWidth(' ');
+        $widthTilLstHyphble = 0;
+        echo "widths (hypen={$hyphenWidth}, space={$spaceWidth})\n";
+
         while (strlen($text) > 0) {
-            if($matchHyphen($text)){
+            if ($matchHyphen($text)) {
+                $lastHyphenable = strlen($toPrint) + 1;
+                $widthTilLstHyphble = 0;
                 continue;
             }
             $ch = substr($text, 0, 1);
+            if ($ch == ' ') {
+                $lastHyphenable = strlen($toPrint) + 1;
+                $widthTilLstHyphble = 0;
+            }
             $w = $getRealWidth($ch);
+            $widthTilLstHyphble += $w;
 
+            // check if the char fits in the remaining room
             if ($w > $width) {
+                echo "{$toPrint} {$lastHyphenable}\n";
+                if ($ch == ' ') {
+                    $toPrint = substr($toPrint, 0, $lastHyphenable - 1);
+                } else {
+                    if ($lastHyphenable < strlen($toPrint) + 1) {
+                        // caution, $lastHypenable could be null
+                        $notHyphenable = substr($toPrint, $lastHyphenable);
+                        $text = $notHyphenable.$text;
+                        echo "\tnotHyphenable = `{$notHyphenable}`\n";
+
+                        $width += $widthTilLstHyphble;
+                        echo "\twidthTilLstHyphble = {$widthTilLstHyphble}\n";
+                        $toPrint = substr($toPrint, 0, $lastHyphenable);
+                    }
+
+                    $chAux = substr($toPrint, -1);
+
+                    if ($chAux == ' ') {
+                        $toPrint = substr($toPrint, 0, $lastHyphenable - 1);
+                        $width += $spaceWidth;
+                    } else {
+                        $toPrint .= '-';
+                        $width -= $hyphenWidth;
+                    }
+                }
+
                 $t = new TextCell(
                     $this->currentX,
                     $this->xformY($this->currentY, $this->currentHeight),
@@ -271,16 +313,22 @@ class HighLevelPdf
                     $toPrint
                 );
                 $words = str_word_count($toPrint);
-                $t->setWordSpace($width / $words);
+                $delta = $words > 0 ? $width / $words : 0.0;
+                //if ($delta > 0.0) {
+                    echo "\tdelta = {$delta}\n";
+
+                    //$t->setWordSpace($delta);
+                //}
                 $this->currentPage->addContent($t);
                 $toPrint = '';
                 $width = $this->currentWidth;
                 //@throw event, break line
                 $this->currentY += $this->currentFontHeight;
+            } else {
+                $toPrint .= $ch;
+                $text = substr($text, 1);
+                $width -= $w;
             }
-            $toPrint .= $ch;
-            $text = substr($text, 1);
-            $width -= $w;
         }
 
         if ($toPrint) {
@@ -297,6 +345,24 @@ class HighLevelPdf
         }
 
         return $this;
+    }
+
+    /**
+     * @param float  $x
+     * @param float  $y
+     * @param float  $w
+     * @param float  $h
+     * @param string $color
+     * @param int    $stroke
+     */
+    public function rectangle($x = null, $y = null, $w = null, $h = null, $color = '0 0 1', $stroke = 1)
+    {
+        $x = $x === null ? $this->getLeftX() : $x;
+        $y = $y === null ? $this->getTopY() : $y;
+        $w = $w === null ? $this->getMaxWidth($x) : $w;
+        $h = $h === null ? $this->getMaxHeight($y) : $h;
+        $rect = new Rectangle($x, $y, $w, $h, $color, $stroke);
+        $this->currentPage->addContent($rect);
     }
 
     /**

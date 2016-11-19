@@ -36,9 +36,11 @@ class Example5 extends AbstractExample
         $pdf->setFont('Lato', 'Regular', 24);
         $pdf->setCell();
         $text = <<<EOD
-This is a long text. The idea is trying to use all the room possible in a single row and get the next row justifying! do you thing that will going to be possible ? Let\'s try and will see.
+This is a long text. The idea is trying to use all the room possible in a single row and get the next row justified! do you thing that will going to be possible ? Let\'s try and will see.
 EOD;
         $pdf->writeTextJustify($text, 'en-us');
+
+        $pdf->rectangle();
 
         $pdf->saveToFile(__DIR__.'/test5.pdf');
     }

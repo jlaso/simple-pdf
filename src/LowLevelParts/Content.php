@@ -53,6 +53,24 @@ class Content implements PartInterface
     }
 
     /**
+     * @param float $x
+     * @param float $y
+     * @param float $w
+     * @param float $h
+     * @param string $color
+     * @param int $stroke
+     */
+    public function addRectangle($x, $y, $w, $h, $color = '0 0 0', $stroke = 4)
+    {
+        $this->stream .= sprintf(
+            "%d w\r\nq\r\n%s RG\r\n%f %f %f %f re\r\nS\r\nQ\r\n",
+            $stroke,
+            $color,
+            $x, $y, $w, $h
+        );
+    }
+
+    /**
      * @param array $options
      * @return string
      */
