@@ -234,7 +234,7 @@ class HighLevelPdf
     public function writeTextJustify($text, $hyphenateLang = null)
     {
         $text = $this->hyphenate($hyphenateLang, $text);
-        $this->log(str_replace("­","·",$text));
+        $this->log(str_replace("­"  /* <- invisible? &shy; */,"·",$text));
         $widths = $this->getFontWidths($this->currentFont);
         $width = $this->currentWidth;
         $toPrint = '';
