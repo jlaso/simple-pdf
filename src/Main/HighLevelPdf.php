@@ -234,11 +234,16 @@ class HighLevelPdf
     public function writeTextJustify($text, $hyphenateLang = null)
     {
         $text = $this->hyphenate($hyphenateLang, $text);
+        $this->log(str_replace("­","·",$text));
         $widths = $this->getFontWidths($this->currentFont);
         $width = $this->currentWidth;
         $toPrint = '';
         $hyphen = $this->hyphenator ? $this->hyphenator->getHyphen() : null;
 
+        /**
+         * @param string $text
+         * @return bool
+         */
         $matchHyphen = function (&$text) use ($hyphen) {
             if ($hyphen && (substr($text, 0, strlen($hyphen)) == $hyphen)) {
                 $text = substr($text, strlen($hyphen));
@@ -249,46 +254,104 @@ class HighLevelPdf
             return false;
         };
 
+        /**
+         * @param string $text
+         * @return bool
+         */
+        $matchNewLine = function (&$text) {
+            if (in_array(substr($text, 0, 1), ["\r", "\n"])) {
+                $text = substr($text, 1);
+
+                return true;
+            }
+            if (in_array(substr($text, 0, 2), ["\r\n", "\n\r"])) {
+                $text = substr($text, 2);
+
+                return true;
+            }
+
+            return false;
+        };
+
+        /**
+         * @param string|int $char
+         * @return float
+         */
         $getRealWidth = function ($char) use ($widths) {
             $char = is_string($char) ? ord($char) : (int) $char;
 
             return $this->realSize(isset($widths[$char]) ? $widths[$char] : $widths[32]);
         };
 
+        /**
+         * @param string $toPrint
+         * @param float $width
+         * @param bool $justify
+         */
+        $finishCurrentLine = function(&$toPrint, &$width, $justify){
+            $t = new TextCell(
+                $this->currentX,
+                $this->xformY($this->currentY, $this->currentHeight),
+                $this->currentWidth,
+                $this->currentHeight,
+                $this->currentFont,
+                $this->currentFontSize,
+                $toPrint
+            );
+            if($justify) {
+                $words = substr_count($toPrint, ' ');
+                $delta = $words > 0 ? $width / $words : 0.0;
+                $t->setWordSpace($delta);
+            }
+            $this->currentPage->addContent($t);
+            $toPrint = '';
+            $width = $this->currentWidth;
+            //@throw event, break line
+            $this->currentY += $this->currentFontHeight;
+        };
+
         $lastHyphenable = null;
         $hyphenWidth = $getRealWidth('-');
         $spaceWidth = $getRealWidth(' ');
-        $widthTilLstHyphble = 0;
-        echo "widths (hypen={$hyphenWidth}, space={$spaceWidth})\n";
+        $this->log("\n\n (hypen={$hyphenWidth}, space={$spaceWidth})\n");
+        $lineWidths = [];
 
         while (strlen($text) > 0) {
+            // check if next thing is a carriage return in order to finish current line.
+            if ($matchNewLine($text)) {
+                $finishCurrentLine($toPrint, $width, false);
+                $lineWidths = [];
+            }
+            // check if next thing is an hyphen in order to remember it just in case get end of line
             if ($matchHyphen($text)) {
-                $lastHyphenable = strlen($toPrint) + 1;
-                $widthTilLstHyphble = 0;
+                $lastHyphenable = strlen($toPrint);
                 continue;
             }
             $ch = substr($text, 0, 1);
             if ($ch == ' ') {
+                if(count($lineWidths) === 0){  // don't print spaces at the beginning of the line
+                    $text = substr($text, 1);
+                    continue;
+                }
                 $lastHyphenable = strlen($toPrint) + 1;
-                $widthTilLstHyphble = 0;
             }
             $w = $getRealWidth($ch);
-            $widthTilLstHyphble += $w;
 
             // check if the char fits in the remaining room
             if ($w > $width) {
-                echo "{$toPrint} {$lastHyphenable}\n";
+                $this->log($toPrint.' '.$lastHyphenable);
                 if ($ch == ' ') {
                     $toPrint = substr($toPrint, 0, $lastHyphenable - 1);
                 } else {
                     if ($lastHyphenable < strlen($toPrint) + 1) {
                         // caution, $lastHypenable could be null
                         $notHyphenable = substr($toPrint, $lastHyphenable);
-                        $text = $notHyphenable.$text;
-                        echo "\tnotHyphenable = `{$notHyphenable}`\n";
+                        $text = ltrim($notHyphenable.$text);
+                        $this->log("notHyphenable = `{$notHyphenable}`");
 
+                        $widthTilLstHyphble = array_sum(array_slice($lineWidths, $lastHyphenable));
                         $width += $widthTilLstHyphble;
-                        echo "\twidthTilLstHyphble = {$widthTilLstHyphble}\n";
+                        $this->log("widthTilLstHyphble = {$widthTilLstHyphble}");
                         $toPrint = substr($toPrint, 0, $lastHyphenable);
                     }
 
@@ -302,30 +365,11 @@ class HighLevelPdf
                         $width -= $hyphenWidth;
                     }
                 }
-
-                $t = new TextCell(
-                    $this->currentX,
-                    $this->xformY($this->currentY, $this->currentHeight),
-                    $this->currentWidth,
-                    $this->currentHeight,
-                    $this->currentFont,
-                    $this->currentFontSize,
-                    $toPrint
-                );
-                $words = str_word_count($toPrint);
-                $delta = $words > 0 ? $width / $words : 0.0;
-                //if ($delta > 0.0) {
-                    echo "\tdelta = {$delta}\n";
-
-                    //$t->setWordSpace($delta);
-                //}
-                $this->currentPage->addContent($t);
-                $toPrint = '';
-                $width = $this->currentWidth;
-                //@throw event, break line
-                $this->currentY += $this->currentFontHeight;
+                $finishCurrentLine($toPrint, $width, true);
+                $lineWidths = [];
             } else {
                 $toPrint .= $ch;
+                $lineWidths[] = $w;
                 $text = substr($text, 1);
                 $width -= $w;
             }
@@ -339,7 +383,7 @@ class HighLevelPdf
                 $this->currentHeight,
                 $this->currentFont,
                 $this->currentFontSize,
-                $toPrint
+                ltrim($toPrint)
             );
             $this->currentPage->addContent($t);
         }
@@ -530,13 +574,17 @@ class HighLevelPdf
     public function saveToFile($fileName)
     {
         $this->process();
-
         $this->pdf->saveToFile($fileName);
+        $this->log("Fonts used:\r\n\r\n".var_export(FontManager::getInstance()->getAliases(), true)."\r\n");
+    }
 
+    /**
+     * @param string $text
+     */
+    private function log($text)
+    {
         if ($this->verbose) {
-            echo "Fonts used:\r\n\r\n".
-                var_export(FontManager::getInstance()->getAliases(), true).
-                "\r\n\r\n";
+            print($text.PHP_EOL);
         }
     }
 }
