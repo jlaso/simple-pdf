@@ -38,16 +38,57 @@ class Content implements PartInterface
      * @param GetAliasInterface|string $font
      * @param float $fontSize
      * @param string $text
+     * @param array $options
      */
-    public function addText($x, $y, $font, $fontSize, $text)
+    public function addText($x, $y, $font, $fontSize, $text, $options = [])
     {
         $fontName = ($font instanceof GetAliasInterface) ? $font->getAlias() : $font;
         $this->stream .= sprintf(
-            "BT\r\n%.2F %.2F Td\r\n/%s %d Tf\r\n(%s) Tj\r\nET\r\n",
+            "BT\r\n%.2F %.2F Td\r\n/%s %d Tf\r\n%s(%s) Tj\r\nET\r\n",
             $x, $y,
             $fontName, $fontSize,
+            $this->developOptions($options),
             $text
         );
+    }
+
+    /**
+     * @param float $x
+     * @param float $y
+     * @param float $w
+     * @param float $h
+     * @param string $color
+     * @param int $stroke
+     */
+    public function addRectangle($x, $y, $w, $h, $color = '0 0 0', $stroke = 4)
+    {
+        $this->stream .= sprintf(
+            "%d w\r\nq\r\n%s RG\r\n%f %f %f %f re\r\nS\r\nQ\r\n",
+            $stroke,
+            $color,
+            $x, $y, $w, $h
+        );
+    }
+
+    /**
+     * @param array $options
+     * @return string
+     */
+    private function developOptions($options)
+    {
+        $result = '';
+        foreach ($options as $optionName => $optionValue){
+            switch ($optionName){
+                case 'word_spacing':
+                    $result .= $optionValue." Tw\n";
+                    break;
+                case 'char_spacing':
+                    $result .= $optionValue." Tc\n";
+                    break;
+            }
+        }
+
+        return $result;
     }
 
     /**

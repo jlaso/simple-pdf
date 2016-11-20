@@ -11,3 +11,5 @@ cache/*.cached
 cache/*.json
 cache/*.php
 cache/*.pdf
+
+bin

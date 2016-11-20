@@ -14,7 +14,7 @@ use PHPfriends\SimplePdf\LowLevelParts\PagesNode;
 use PHPfriends\SimplePdf\LowLevelParts\PdfDate;
 use PHPfriends\SimplePdf\LowLevelParts\ResourceNode;
 
-class Example4
+class Example4 extends AbstractExample
 {
     protected $pdf;
     protected $verbose = true;
@@ -41,13 +41,6 @@ class Example4
 
         $pdf->saveToFile(__DIR__.'/test4.pdf');
     }
-
-    public static function main()
-    {
-        $o = new Example4();
-        $o->process();
-    }
 }
 
 Example4::main();
-echo "Done! \n";
