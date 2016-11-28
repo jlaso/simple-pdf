@@ -1,3 +1,100 @@
 hyphenation:
     language: en-us
     hyphen: "\xAD"
+
+styles:
+  document:
+    color_space: rgb
+  paper_size:
+    width: 612.0
+    height: 792.0
+  h1:
+    font:
+      name: Lato
+      style: Bold
+      size: 40
+      color: blue
+    border:
+      width: 0
+      color: black
+    background: 0xff,0xff,0xff
+  h2:
+    font:
+      name: Lato
+      style: Bold
+      size: 35
+      color: green
+    border:
+      width: 0
+      color: black
+    background: 0xff,0xff,0xff
+  h3:
+    font:
+      name: Lato
+      style: Regular
+      size: 30
+      color: red
+    border:
+      width: 0
+      color: black
+    background: 0xff,0xff,0xff
+  h4:
+    font:
+      name: Lato
+      style: Regular
+      size: 25
+      color: black
+    border:
+      width: 0
+      color: black
+    background: 0xff,0xff,0xff
+  h5:
+    font:
+      name: Lato
+      style: Bold
+      size: 22
+      color: black
+    border:
+      width: 0
+      color: black
+    background: 0xff,0xff,0xff
+  h6:
+    font:
+      name: Lato
+      style: Regular
+      size: 20
+      color: black
+    border:
+      width: 0
+      color: black
+    background: 0xff,0xff,0xff
+  p:
+    font:
+      name: Lato
+      style: Regular
+      size: 14
+      color: black
+    border:
+      width: 0
+      color: black
+    background: 0xff,0xff,0xff
+  em:
+    font:
+      name: Lato
+      style: Bold
+      size: 14
+      color: black
+    border:
+      width: 0
+      color: black
+    background: 0xff,0xff,0xff
+  code:
+    font:
+      name: Neuton
+      style: Regular
+      size: 14
+      color: black
+    border:
+      width: 0
+      color: black
+    background: 0xff,0xff,0xff

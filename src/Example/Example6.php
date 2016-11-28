@@ -5,13 +5,14 @@ namespace PHPfriends\SimplePdf\Example;
 include __DIR__.'/../../vendor/autoload.php';
 
 use PHPfriends\SimplePdf\Adaptor\SyllableAdaptor;
+use PHPfriends\SimplePdf\Common\Config;
 use PHPfriends\SimplePdf\Events\Events;
 use PHPfriends\SimplePdf\Events\LineBreakEvent;
 use PHPfriends\SimplePdf\Events\PageBreakEvent;
-use PHPfriends\SimplePdf\Main\HighLevelPdf;
 use PHPfriends\SimplePdf\LowLevelParts\PdfDate;
+use PHPfriends\SimplePdf\Main\MarkdownPdf;
 
-class Example5 extends AbstractExample
+class Example6 extends AbstractExample
 {
     protected $pdf;
     protected $verbose = true;
@@ -20,31 +21,40 @@ class Example5 extends AbstractExample
 
     public function process()
     {
-        $pdf = new HighLevelPdf(612.0, 792.0, $this->verbose);
+        $config = Config::getInstance()->get('styles');
+        $pdf = new MarkdownPdf($config, $this->verbose);
         $pdf->setHyphenator(new SyllableAdaptor());
         $pdf->getEventDispatcher()->addListener(Events::EVT_LINE_BREAK, [$this, 'lineBreakListener']);
         $pdf->getEventDispatcher()->addListener(Events::EVT_PAGE_BREAK, [$this, 'pageBreakListener']);
 
-        $pdf->setMetadata('Title', 'Example 5 @ High Level');
+        $pdf->setMetadata('Title', 'Example 6 @ Markdown');
         $pdf->setMetadata('Author', '@PHPfriendsTK');
         $pdf->setMetadata('Creator', 'https://github.com/PHPfriends/simple-pdf');
         $pdf->setMetadata('Producer', 'https://packagist.org/packages/phpfriends/simple-pdf');
         $pdf->setMetadata('CreationDate', new PdfDate());
         $pdf->setMetadata('Keywords', ['simple-pdf', 'example', 'PHPfriends']);
 
-        $pdf->setFont('Lato', 'Regular', 20);
-        $pdf->setCell();
-        $text = <<<EOD
-This is a long text. The idea is trying to use all the room possible in a single row and get the next row justified! do you thing that will going to be possible? Let\'s try and will see.
-Another long line but this time without estrange or special quantity of adjectives or longitude or latitude points of view.
-What is Lorem Ipsum?
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+        $text = <<<'EOD'
+# Chapter 1
+
+## Subchapter
+
+### Section
+
+Once upon a time ... 
+
+This is a _real_ example of the *first* try to **interpret** and print markdown as
+pdf. The next things will consist in improve the language the system is able
+to recognize.
+
 EOD;
-        $pdf->writeTextJustify($text, 'en-us');
+
+        $pdf->setCell();
+        $pdf->mdWriteTextJustify($text, 'en-us');
 
         $pdf->rectangle();
 
-        $pdf->saveToFile(__DIR__.'/test5.pdf');
+        $pdf->saveToFile(__DIR__.'/test6.pdf');
 
         echo sprintf("There were %d lines printed\n", $this->lines);
         echo sprintf("And %d pages printed\n", $this->pages);
@@ -61,4 +71,4 @@ EOD;
     }
 }
 
-Example5::main();
+Example6::main();

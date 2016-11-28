@@ -4,7 +4,7 @@ namespace PHPfriends\SimplePdf\Events;
 
 class PageOverflowEvent extends BaseEvent
 {
-    const NAME = 'page.overflow';
+    const NAME = Events::EVT_PAGE_OVERFLOW;
 
     /** @var int */
     protected $pageNum;

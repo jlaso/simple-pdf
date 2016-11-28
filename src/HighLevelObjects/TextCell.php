@@ -2,6 +2,7 @@
 
 namespace PHPfriends\SimplePdf\HighLevelObjects;
 
+use PHPfriends\SimplePdf\LowLevelParts\Color;
 use PHPfriends\SimplePdf\LowLevelParts\Content;
 
 class TextCell implements ContentInterface
@@ -22,17 +23,19 @@ class TextCell implements ContentInterface
     protected $charSpace;
     /** @var float */
     protected $wordSpace;
+    /** @var string|Color */
+    protected $fontColor;
 
     /** @var string */
     protected $text;
 
     /**
-     * @param float $x
-     * @param float $y
-     * @param float $w
-     * @param float $h
-     * @param Font $font
-     * @param float $fontSize
+     * @param float  $x
+     * @param float  $y
+     * @param float  $w
+     * @param float  $h
+     * @param Font   $font
+     * @param float  $fontSize
      * @param string $text
      */
     public function __construct($x, $y, $w, $h, $font, $fontSize, $text)
@@ -46,6 +49,7 @@ class TextCell implements ContentInterface
         $this->text = $text;
         $this->charSpace = null;
         $this->wordSpace = null;
+        $this->fontColor = null;
     }
 
     /**
@@ -65,7 +69,16 @@ class TextCell implements ContentInterface
     }
 
     /**
+     * @param Color|string $fontColor
+     */
+    public function setFontColor($fontColor)
+    {
+        $this->fontColor = $fontColor;
+    }
+
+    /**
      * @param array $options
+     *
      * @return Content
      */
     public function dump($options = [])
@@ -84,6 +97,7 @@ class TextCell implements ContentInterface
         $options = [];
         $this->charSpace && $options['char_spacing'] = $this->charSpace;
         $this->wordSpace && $options['word_spacing'] = $this->wordSpace;
+        $this->fontColor && $options['font_color'] = $this->fontColor;
         $content->addText($this->x, $this->y, $this->font, $this->fontSize, $this->text, $options);
     }
 }

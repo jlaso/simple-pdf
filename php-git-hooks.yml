@@ -8,7 +8,7 @@ pre-commit:
             enabled: false
             options: null
         phpcs:
-            enabled: true
+            enabled: false
             standard: PSR2
         php-cs-fixer:
             enabled: true
