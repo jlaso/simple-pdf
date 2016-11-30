@@ -24,6 +24,8 @@ use PHPfriends\SimplePdf\LowLevelParts\PdfName;
 use PHPfriends\SimplePdf\LowLevelParts\PdfNumber;
 use PHPfriends\SimplePdf\LowLevelParts\ResourceNode;
 use PHPfriends\SimplePdf\Measurement\FontMetrics;
+use PHPfriends\SimplePdf\Util\PseudoXmlParser;
+use PHPfriends\SimplePdf\Util\TextStatus;
 
 class HighLevelPdf
 {
@@ -316,6 +318,66 @@ class HighLevelPdf
     }
 
     /**
+     * @return TextStatus[]
+     */
+    private function makeFontSetAndWidths()
+    {
+        $baseFont = $this->currentFont;
+        $size = $this->currentFontSize;
+        $name = $baseFont->getName();
+        $style = $baseFont->getStyle();
+
+        /** @var TextStatus[] $fonts */
+        $fonts = [];
+
+        $fonts[PseudoXmlParser::NONE] = new TextStatus(
+            $baseFont,
+            $this->getFontWidths($baseFont),
+            $size
+        );
+
+        $auxFont = new Font($name, 'Bold');
+
+        $fonts[PseudoXmlParser::BOLD] = new TextStatus(
+            $auxFont,
+            $this->getFontWidths($auxFont),
+            $size
+        );
+
+        $auxFont = new Font($name, 'Italic');
+
+        $fonts[PseudoXmlParser::ITALIC] = new TextStatus(
+            $auxFont,
+            $this->getFontWidths($auxFont),
+            $size
+        );
+
+        $auxFont = $baseFont;
+
+        $fonts[PseudoXmlParser::LINK] = new TextStatus(
+            $auxFont,
+            $this->getFontWidths($auxFont),
+            $size
+        );
+
+        $auxFont = $baseFont;
+        $size /= 2;
+
+        $fonts[PseudoXmlParser::SUPERSCRIPT] = new TextStatus(
+            $auxFont,
+            $this->getFontWidths($auxFont),
+            $size,
+            3 * $baseFont->getFontHeight($size)/2
+        );
+
+        $fonts[PseudoXmlParser::SUBSCRIPT] = $fonts[PseudoXmlParser::SUPERSCRIPT];
+        $fonts[PseudoXmlParser::SUBSCRIPT]->hOffset *= -1;
+        $fonts[PseudoXmlParser::SUBSCRIPT]->hOffset /= 2;
+
+        return $fonts;
+    }
+
+    /**
      * @param string $text
      * @param string $hyphenateLang
      *
@@ -328,10 +390,12 @@ class HighLevelPdf
         $this->log("HighLevelPdf::writeTextJustify('{$text}', '{$hyphenateLang}')");
         $text = $this->hyphenate($hyphenateLang, $text);
         $this->log("Hyphenated: '".str_replace('­'  /* <- invisible? &shy; */, '·', $text)."'");
-        $widths = $this->getFontWidths($this->currentFont);
+        //$widths = $this->getFontWidths($this->currentFont);
         $width = $this->currentWidth;
         $toPrint = '';
         $hyphen = $this->hyphenator ? $this->hyphenator->getHyphen() : null;
+        $parser = new PseudoXmlParser($this->makeFontSetAndWidths());
+        $parser->switchStatus($this->currentFont, $this->currentFontSize, $widths);
 
         /**
          * @param string $text

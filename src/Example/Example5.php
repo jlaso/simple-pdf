@@ -36,9 +36,9 @@ class Example5 extends AbstractExample
         $pdf->setCell();
         $text = <<<EOD
 This is a long text. The idea is trying to use all the room possible in a single row and get the next row justified! do you thing that will going to be possible? Let\'s try and will see.
-Another long line but this time without estrange or special quantity of adjectives or longitude or latitude points of view.
+Another long line but this time without <b>estrange</> or special quantity of adjectives or longitude or latitude points of view.
 What is Lorem Ipsum?
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+Lorem Ipsum is simply dummy text of the <b>printing <i>and</> typesetting</i> industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 EOD;
         $pdf->writeTextJustify($text, 'en-us');
 
