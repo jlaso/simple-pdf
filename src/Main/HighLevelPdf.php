@@ -106,6 +106,22 @@ class HighLevelPdf
     }
 
     /**
+     * @param boolean $twoSided
+     */
+    public function setTwoSided($twoSided)
+    {
+        $this->twoSided = $twoSided;
+    }
+
+    /**
+     * @return float
+     */
+    public function getCurrentFontHeight()
+    {
+        return $this->currentFontHeight;
+    }
+
+    /**
      * @param HyphenatorInterface $hyphenator
      */
     public function setHyphenator($hyphenator)
@@ -142,7 +158,8 @@ class HighLevelPdf
 
     public function newPage()
     {
-        ++$this->currentPage;
+        ++$this->currentPageNum;
+        $this->log(sprintf('HighLevelPdf::newPage(currentPageNum=%s)', $this->currentPageNum));
         $this->currentPage = new Page($this->currentPageNum);
         $this->pages[$this->currentPageNum] = $this->currentPage;
     }
@@ -315,6 +332,26 @@ class HighLevelPdf
         $width = $this->currentWidth;
         $this->throwEvent(new LineBreakEvent($this->currentPage));
         $this->currentY += $this->currentFontHeight;
+    }
+
+    /**
+     * @param string $text
+     */
+    public function writeText($text)
+    {
+        $t = new TextCell(
+            $this->currentX,
+            $this->xformY($this->currentY, $this->currentHeight),
+            $this->currentWidth,
+            $this->currentHeight,
+            $this->currentFont,
+            $this->currentFontSize,
+            $text
+        );
+        if ($this->currentFontColor) {
+            $t->setFontColor($this->currentFontColor);
+        }
+        $this->currentPage->addContent($t);
     }
 
     /**
@@ -499,6 +536,27 @@ class HighLevelPdf
     }
 
     /**
+     * @param string $text
+     * @return float
+     */
+    public function getRealWidth($text)
+    {
+        $widths = $this->getFontWidths($this->currentFont);
+        $getRealWidth = function ($char) use ($widths) {
+            $char = is_string($char) ? ord($char) : (int) $char;
+
+            return $this->realSize(isset($widths[$char]) ? $widths[$char] : $widths[32]);
+        };
+        $width = 0;
+        for($i=0; $i<strlen($text); $i++) {
+            $ch = substr($text, $i, 1);
+            $width += $getRealWidth($ch);
+        }
+
+        return $width;
+    }
+
+    /**
      * @param float  $x
      * @param float  $y
      * @param float  $w
@@ -509,7 +567,7 @@ class HighLevelPdf
     public function rectangle($x = null, $y = null, $w = null, $h = null, $color = '0 0 1', $stroke = 1)
     {
         $x = $x === null ? $this->getLeftX() : $x;
-        $y = $y === null ? $this->getTopY() : $y;
+        $y = $y === null ? $this->getTopY() : $this->xformY($y);
         $w = $w === null ? $this->getMaxWidth($x) : $w;
         $h = $h === null ? $this->getMaxHeight($y) : $h;
         $rect = new Rectangle($x, $y, $w, $h, $color, $stroke);
@@ -519,7 +577,7 @@ class HighLevelPdf
     /**
      * @return float
      */
-    protected function getLeftX()
+    public function getLeftX()
     {
         return !$this->twoSided || $this->oddPage() ? $this->innerMargin : $this->outerMargin;
     }
@@ -527,7 +585,7 @@ class HighLevelPdf
     /**
      * @return float
      */
-    protected function getRightX()
+    public function getRightX()
     {
         return $this->pageWidth -
         (!$this->twoSided || $this->oddPage()
@@ -539,7 +597,7 @@ class HighLevelPdf
     /**
      * @return float
      */
-    protected function getTopY()
+    public function getTopY()
     {
         return $this->topMargin;
     }
@@ -557,7 +615,7 @@ class HighLevelPdf
      *
      * @return float
      */
-    protected function getMaxWidth($currX)
+    public function getMaxWidth($currX = null)
     {
         return $this->getRightX() - (
         (null === $currX)
@@ -567,11 +625,19 @@ class HighLevelPdf
     }
 
     /**
+     * @return float
+     */
+    public function getPageWidth()
+    {
+        return $this->pageWidth;
+    }
+
+    /**
      * @param float $currY
      *
      * @return float
      */
-    protected function getMaxHeight($currY)
+    public function getMaxHeight($currY = null)
     {
         return $this->getBottomY() - (
         (null === $currY)
@@ -613,6 +679,7 @@ class HighLevelPdf
         $this->pdf->addObject($pagesNode);
 
         foreach ($this->pages as $page) {
+            $this->log('HighLevelPdf::process adding page '.$page->getPageNum());
             $pageResources = new ResourceNode();
             $contents = $page->getContents();
             if (count($contents) > 0) {
